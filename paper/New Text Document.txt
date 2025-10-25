@@ -1,0 +1,53 @@
+
+---
+
+---
+
+## paper.md (for JOSS)  
+```markdown
+---
+title: "PlantDoc-Predictor: A Python library for predicting plant leaf diseases using multimodel deep learning"
+authors:
+  - name: Subham Divakar
+    affiliation: 1
+    orcid: https://orcid.org/0000-0000-0000-0000
+affiliations:
+  - index: 1
+    name: Department of Computer Science and Engineering, Bengaluru, Karnataka, India
+date: 25 October 2025
+bibliography: paper.bib
+---
+
+# Summary  
+Plant diseases cause significant crop losses globally. Timely and accurate disease detection from leaf images is critical for precision agriculture. *PlantDoc-Predictor* is a Python library that offers a unified interface to multiple pre-trained deep learning models (e.g., InceptionV3, ResNet50, MobileNetV2) for the classification of plant diseases from leaf images. The library also supports user-trained custom models and label mappings, enabling rapid deployment and benchmarking. This tool enables researchers and practitioners to focus on application rather than re-implementing baseline architectures.
+
+# Statement of need  
+Researchers and agritech developers often need to train, compare and deploy plant-disease classification models. Although numerous publications and repositories exist for specific crop–disease pairs, there is a lack of modular, multi-architecture libraries that combine curated pretrained models, standardized label sets (e.g., the 38-class PlantVillage dataset), and a simple API. PlantDoc-Predictor fills this gap by offering an extensible framework with built-in models, label mappings, and treatment of custom models, reducing redundant implementation effort and enhancing reproducibility.
+
+# Key features  
+- Pre-trained backbones with known accuracy metrics for rapid prototyping.  
+- Uniform API for built-in and custom models: `Predictor(model_name=…)` or `Predictor(model_path=…)`.  
+- Model registry mechanism (`model_registry.json`) for transparent metadata (input size, accuracy, label file).  
+- Simple image-load, preprocess, predict pipeline with optional visualization and verbose logging.  
+- Built-in support for 38 disease classes commonly used in plant-disease research, plus extension to new classes or crops.
+
+# Implementation and architecture  
+The library is implemented in Python using TensorFlow/Keras. Models are saved in HDF5 format (`.h5`) and label mappings in JSON. The `Predictor` class dynamically loads the required model and performs preprocessing according to architecture (e.g., InceptionV3 preprocessing) and inference. Model metadata lives in `model_registry.json`, enabling users to list available models or add their own.  
+The design supports CPU and GPU contexts and can be installed via `pip install plantdoc‐predictor`.
+
+# Quality control  
+Unit tests (via `pytest`) validate model loading, label alignment, preprocessing shapes and basic predictions. The repository includes a demo notebook and example images to illustrate reproducible usage.  
+All code is open-source under an MIT license, with CI workflows for build verification.
+
+# Reuse potential  
+PlantDoc-Predictor is suitable for agritech startups, academic research, extension services and precision-agriculture platforms. It can be integrated into pipelines for crop monitoring, mobile apps, greenhouse sensor networks or large-scale image datasets. Researchers can replace built-in models with custom fine-tuned models while preserving the same API.  
+Because the library standardizes model access and label mapping, it encourages comparability across experiments and promotes reproducible benchmarking.
+
+# Acknowledgements  
+This work was supported by [Insert funding body if any]. I thank the open-source community for maintaining TensorFlow and Keras, and the maintainers of the PlantVillage dataset for making their crop–disease images publicly available.
+
+# References  
+1. Hughes, D.P. & Salathé, M. (2015). An open access repository of plant disease images. *Scientific Reports*, 5, 1–10. DOI:10.1038/srep08175  
+2. Simonyan, K. & Zisserman, A. (2015). Very deep convolutional networks for large‐scale image recognition. *International Conference on Learning Representations (ICLR)*.  
+3. Howard, A.G. et al. (2017). MobileNets: Efficient convolutional neural networks for mobile vision applications. *arXiv preprint arXiv:1704.04861*.  
+4. Szegedy, C. et al. (2016). Rethinking the inception architecture for computer vision. *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*.  

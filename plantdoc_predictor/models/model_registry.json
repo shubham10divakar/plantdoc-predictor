@@ -1,0 +1,28 @@
+{
+  "models": [
+    {
+      "name": "inceptionv3",
+      "path": "inceptionv3_v1.h5",
+      "labels": "inceptionv3_labels.json",
+      "input_size": [299, 299],
+      "accuracy": 0.982,
+      "description": "InceptionV3 model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "resnet50",
+      "path": "plantdoc_predictor/models/resnet50_default.h5",
+      "labels": "plantdoc_predictor/models/resnet50_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.978,
+      "description": "ResNet50 fine-tuned on same dataset"
+    },
+    {
+      "name": "mobilenetv2",
+      "path": "plantdoc_predictor/models/mobilenetv2_default.h5",
+      "labels": "plantdoc_predictor/models/mobilenetv2_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "description": "Lightweight model for edge/mobile deployment"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+python -m build
+
+pip install dist/plantdoc_predictor-0.1.0-py3-none-any.whl
+
+pip uninstall dist/plantdoc_predictor-0.1.0-py3-none-any.whl
+
+open conda terminal using "tetsingforplantdoc" and do install and uninstall and use spyder form here only
+
+
+to publish-> 
+Change version if required
+python -m build
+python -m twine upload dist/*
+enter the api token ->> full token starting with pypi....
+
+
+
+1. to list all models
+from plantdoc_predictor.predictor import list_available_models
+list_available_models()
+
+

@@ -1,0 +1,4 @@
+include plantdoc_predictor/models/*.h5
+include plantdoc_predictor/models/*.json
+include README.md
+include LICENSE

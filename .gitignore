@@ -1,0 +1,30 @@
+# Python cache & build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.egg-info/
+build/
+dist/
+
+# Environments
+venv/
+.env/
+*.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model & large data files
+*.h5
+*.ckpt
+*.pb
+*.tflite
+*.weights
+*.pt
+*.onnx
+
+# OS files
+.DS_Store
+Thumbs.db
