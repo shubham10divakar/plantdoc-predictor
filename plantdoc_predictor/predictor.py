@@ -11,6 +11,8 @@ Version: 1.0.0
 import os
 import json
 import numpy as np
+import requests
+from tqdm import tqdm
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
@@ -28,6 +30,46 @@ def load_model_registry():
         registry = json.load(f)
     
     return registry.get("models", [])
+
+# ---------------------------------------------------------------------
+# Model Cache Directory
+# ---------------------------------------------------------------------
+CACHE_DIR = os.path.join(os.path.expanduser("~"), ".plantdoc")
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+
+def download_if_needed(url, filename, verbose=True):
+    """Download file from URL into local cache if not already present."""
+    save_path = os.path.join(CACHE_DIR, filename)
+
+    if os.path.exists(save_path):
+        if verbose:
+            print(f"✔ Using cached file: {filename}")
+        return save_path
+
+    if verbose:
+        print(f"⬇ Downloading {filename}...")
+
+    response = requests.get(url, stream=True)
+    response.raise_for_status()
+
+    total_size = int(response.headers.get("content-length", 0))
+    block_size = 8192
+
+    with open(save_path, "wb") as f, tqdm(
+        total=total_size,
+        unit="B",
+        unit_scale=True,
+        desc=filename,
+        disable=not verbose
+    ) as bar:
+        for chunk in response.iter_content(block_size):
+            if chunk:
+                f.write(chunk)
+                bar.update(len(chunk))
+
+    return save_path
+
 
 
 # ---------------------------------------------------------------------
@@ -82,16 +124,15 @@ class Predictor:
             if not model_info:
                 raise ValueError(f"Model '{model_name}' not found in registry.")
             
-            package_dir = os.path.dirname(__file__)
-            model_path = os.path.join(package_dir, "models", model_info["path"])
-            label_path = os.path.join(package_dir, "models", model_info["labels"])
-            
-            #print(model_path)
+            model_url = model_info["remote_model"]
+            labels_url = model_info["remote_labels"]
 
-            if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Model file missing: {model_path}")
-            if not os.path.exists(label_path):
-                raise FileNotFoundError(f"Label file missing: {label_path}")
+            model_filename = f"{model_name}.h5"
+            labels_filename = f"{model_name}_labels.json"
+
+            model_path = download_if_needed(model_url, model_filename, self.verbose)
+            label_path = download_if_needed(labels_url, labels_filename, self.verbose)
+
 
             self.model = load_model(model_path)
             self.model_name = model_name
@@ -150,7 +191,8 @@ class Predictor:
             print(f"📂 Image Path     : {img_path}")
             print(f"🧩 Model Used     : {self.model_name}")
             print(f"✅ Predicted Class: {label}")
-            print(f"🔢 Confidence     : {float(np.max(preds))}%")
+            confidence = float(np.max(preds)) * 100
+            print(f"🔢 Confidence     : {confidence:.2f}%")
             #print("\n🏆 Top-3 Predictions:")
             
             # Top-3 predictions
