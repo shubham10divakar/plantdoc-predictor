@@ -29,8 +29,8 @@
     },
     {
       "name": "mobilenetv2_v1",
-      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_default/mobilenetv2_default.h5",
-      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_default/mobilenetv2_labels.json",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_v1/mobilenev2_v1.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_v1/mobilenev2_v1_labels.json",
       "input_size": [224, 224],
       "accuracy": 0.968,
       "preprocessing": "mobilenetv2",
