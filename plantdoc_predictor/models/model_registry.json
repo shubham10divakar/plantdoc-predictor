@@ -1,27 +1,39 @@
 {
   "models": [
     {
-      "name": "inceptionv3",
+      "name": "inceptionv3_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1.h5",
-      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_labels.json",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1_labels.json",
       "input_size": [299, 299],
       "accuracy": 0.982,
+      "preprocessing": "inception",
       "description": "InceptionV3 model fine-tuned on PlantVillage 38-class dataset"
     },
     {
-      "name": "resnet50",
-      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/resnet50_default/resnet50_default.h5",
-      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/resnet50_default/resnet50_labels.json",
+      "name": "resnet50_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/resnet50_v1/resnet_50_v1.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/resnet50_v1/resnet_50_v1_labels.json",
       "input_size": [224, 224],
       "accuracy": 0.978,
-      "description": "ResNet50 fine-tuned on same dataset"
+      "preprocessing": "resnet50",
+      "description": "ResNet50 fine-tuned on PlantVillage 38-class dataset"
     },
     {
-      "name": "mobilenetv2",
+      "name": "efficientnetb50_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/efficientnetb50_v1/efficientnetb50_v1.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/efficientnetb50_v1/efficientnetb50_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.978,
+      "preprocessing": "efficientnet",
+      "description": "EfficientNetB50 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "mobilenetv2_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_default/mobilenetv2_default.h5",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/mobilenetv2_default/mobilenetv2_labels.json",
       "input_size": [224, 224],
       "accuracy": 0.968,
+      "preprocessing": "mobilenetv2",
       "description": "Lightweight model for edge/mobile deployment"
     }
   ]

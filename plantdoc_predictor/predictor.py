@@ -15,6 +15,7 @@ import requests
 from tqdm import tqdm
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
 
 
 # ---------------------------------------------------------------------
@@ -139,9 +140,26 @@ class Predictor:
             self.input_size = tuple(model_info.get("input_size", [224, 224]))
             self.accuracy = model_info.get("accuracy", None)
             self.description = model_info.get("description", "")
+            self.preprocessing_type = model_info.get("preprocessing", "rescale")
 
+            #with open(label_path, "r") as f:
+                #self.labels = json.load(f).get("labels", [])
             with open(label_path, "r") as f:
-                self.labels = json.load(f).get("labels", [])
+                data = json.load(f)
+            
+            # Case 1: {"labels": [...]}
+            if isinstance(data, dict) and "labels" in data:
+                self.labels = data["labels"]
+
+            # Case 2: {"class_name": index}
+            elif isinstance(data, dict):
+                # 🔥 Reverse mapping
+                idx_to_class = {v: k for k, v in data.items()}
+                # Convert to list (index aligned)
+                self.labels = [idx_to_class[i] for i in range(len(idx_to_class))]
+
+            else:
+                raise ValueError("Unsupported label format in JSON.")
 
         else:
             raise ValueError("Please provide either model_name or model_path.")
@@ -158,7 +176,11 @@ class Predictor:
         img = image.load_img(img_path, target_size=self.input_size)
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
-        x = x / 255.0
+        
+        if self.preprocessing_type == "efficientnet":
+            x = eff_preprocess(x)
+        else:    
+            x = x / 255.0
         return x
 
     # -----------------------------------------------------------------
