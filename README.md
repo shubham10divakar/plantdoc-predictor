@@ -71,6 +71,7 @@ Some of the upcoming models planned for integration include:
 - **Hybrid CNN–Transformer models**
 - **Swin Transformers** — e.g., `swin_tiny_patch4_window7_224`
 - **EfficientNetV2 family**
+- **Multimodal models for plant disease detection that I presented via many conferences.**
 
 Planned release very month and many more features to get added as well. 
 
@@ -205,64 +206,84 @@ Install directly via pip:
 
 ```bash
 pip install plantdoc-predictor
+```
 
-## 🧩 Quick Start
+## 🚀 How to Use `plantdoc_predictor`
+
+`plantdoc_predictor` provides an easy-to-use interface for plant disease prediction using multiple pretrained deep learning models trained on the **PlantVillage 38-class dataset**.
+
+---
+
+## 1️⃣ List Available Models
+
+You can view all available pretrained models using:
 
 ```python
-from plantdoc_predictor import Predictor, list_available_models
+from plantdoc_predictor import predictor, Predictor
 
-# List built-in models
-list_available_models()
+predictor.list_available_models()
 
-# Load predictor using InceptionV3
-predictor = Predictor(model_name="inceptionv3", verbose=True)
+Output:-
 
-# Predict a sample image
-result = predictor.predict("path/to/leaf_image.jpg")
+Available Models:
+-----------------
+- inceptionv3_v1      | Input: [299, 299] | Acc: 98.20% | InceptionV3 model fine-tuned on PlantVillage 38-class dataset
+- resnet50_v1         | Input: [224, 224] | Acc: 97.80% | ResNet50 fine-tuned on PlantVillage 38-class dataset
+- efficientnetb50_v1  | Input: [224, 224] | Acc: 97.80% | EfficientNetB50 fine-tuned on PlantVillage 38-class dataset
+- mobilenetv2_v1      | Input: [224, 224] | Acc: 96.80% | Lightweight model for edge/mobile deployment
+- densenet121_v1      | Input: [224, 224] | Acc: 98.68% | DenseNet121 fine-tuned on PlantVillage 38-class dataset
+- densenet169_v1      | Input: [224, 224] | Acc: 99.68% | DenseNet169 fine-tuned on PlantVillage 38-class dataset
+- densenet210_v1      | Input: [224, 224] | Acc: 97.00% | DenseNet210 fine-tuned on PlantVillage 38-class dataset
+- vgg16_v1            | Input: [224, 224] | Acc: 96.80% | VGG16 fine-tuned on PlantVillage 38-class dataset
+- vgg19_v1            | Input: [224, 224] | Acc: 98.98% | VGG19 fine-tuned on PlantVillage 38-class dataset
+- alexnet_v1          | Input: [224, 224] | Acc: 92.80% | AlexNet fine-tuned on PlantVillage 38-class dataset
+```
+## 2. Choose a model from the available ones and use it below.
+
+```
+from plantdoc_predictor import predictor, Predictor
+#predictor.list_available_models()
+
+predictor = Predictor(model_name="efficientnetb50_v1", verbose=False)
+result = predictor.predict("D:/D/my docs/my docs/projects/plant disease detection on streamlit cloud/streamlit plant disease detection/data/plantvillagedataset/train/color/Blueberry___healthy/0a3f8b2f-9bb1-4da9-85a1-fb5a52c059e2___RS_HL 2478.JPG")
 print(result)
 
-🔄 Loading InceptionV3 model...
-✅ Model loaded successfully!
+Output:-
+{
+ 'model': 'efficientnetb50_v1',
+ 'label': 'Blueberry___healthy',
+ 'confidence': 0.9999573230743408
+}
+
+```
+
+when verbose=True in Predictor(model_name="efficientnetb50_v1", verbose=True)
+
+```
+from plantdoc_predictor import predictor, Predictor
+#predictor.list_available_models()
+
+predictor = Predictor(model_name="efficientnetb50_v1", verbose=True)
+result = predictor.predict("D:/D/my docs/my docs/projects/plant disease detection on streamlit cloud/streamlit plant disease detection/data/plantvillagedataset/train/color/Blueberry___healthy/0a3f8b2f-9bb1-4da9-85a1-fb5a52c059e2___RS_HL 2478.JPG")
+print(result)
+
+OUTPUT:-
+
+✔ Using cached file: efficientnetb50_v1.h5
+✔ Using cached file: efficientnetb50_v1_labels.json
+WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+1/1 ━━━━━━━━━━━━━━━━━━━━ 2s 2s/step
 
 ================= Prediction Result =================
-📂 Image Path     : path/to/leaf_image.jpg
-✅ Predicted Class: Apple___Apple_scab
-🔢 Confidence     : 98.42%
-🏆 Top-3 Predictions:
-   • Apple___Apple_scab                        → 98.42%
-   • Apple___Black_rot                         → 0.97%
-   • Apple___Cedar_apple_rust                  → 0.43%
-=====================================================
-
-{'model': 'inceptionv3', 'label': 'Apple___Apple_scab', 'confidence': 0.9842}
-
-```
-
-# Using a Custom Model
-```python
-You can use your own trained TensorFlow/Keras model instead of the built-in ones.
-predictor = Predictor(
-    model_path="models/my_custom_model.h5",
-    label_path="models/my_labels.json",
-    verbose=True
-)
-
-result = predictor.predict("path/to/custom_leaf.jpg", show_plot=True)
-print(result)
+📂 Image Path     : D:/D/my docs/my docs/projects/plant disease detection on streamlit cloud/streamlit plant disease detection/data/plantvillagedataset/train/color/Blueberry___healthy/0a3f8b2f-9bb1-4da9-85a1-fb5a52c059e2___RS_HL 2478.JPG
+🧩 Model Used     : efficientnetb50_v1
+✅ Predicted Class: Blueberry___healthy
+🔢 Confidence     : 100.00%
+{'model': 'efficientnetb50_v1', 'label': 'Blueberry___healthy', 'confidence': 0.9999573230743408}
 ```
 
 
-✅ The library automatically detects input shape and normalizes image data.
-✅ You can store your label mapping in a JSON file with the format:
-```python
-{
-  "labels": [
-    "Apple___Apple_scab",
-    "Apple___Black_rot",
-    "Apple___Cedar_apple_rust",
-    "Apple___healthy"
-  ]
-}
+
 
 ## 📝 License
 
