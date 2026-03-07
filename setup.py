@@ -7,7 +7,7 @@ with io.open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="plantdoc-predictor",
-    version="0.1.1",  # ⬅️ bump version (PyPI doesn’t allow re-upload of same version)
+    version="0.2.1",  # ⬅️ bump version (PyPI doesn’t allow re-upload of same version)
     author="Subham Divakar",
     author_email="shubham.divakar@gmail.com",
     description="A Python library for predicting plant diseases from leaf images using trained deep learning models.",
