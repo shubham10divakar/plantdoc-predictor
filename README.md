@@ -81,8 +81,6 @@ Stay tuned for future releases as the **PlantDoc Model Zoo continues to grow. �
 
 ---
 
----
-
 ## 🌍 Community & Contact
 
 PlantDoc-Predictor is growing into a **widely used open-source machine learning library for plant disease classification**.  
@@ -175,8 +173,6 @@ The following table compares the pretrained models included in **PlantDoc-Predic
 | VGG16 v1 | ~138M | 224×224 | 96.8% | Baseline CNN benchmark |
 | VGG19 v1 | ~144M | 224×224 | 98.98% | Deeper VGG architecture |
 | AlexNet v1 | ~60M | 224×224 | 92.8% | Historical CNN baseline |
-
----
 
 ---
 
@@ -281,9 +277,6 @@ WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be 
 🔢 Confidence     : 100.00%
 {'model': 'efficientnetb50_v1', 'label': 'Blueberry___healthy', 'confidence': 0.9999573230743408}
 ```
-
-
-
 
 ## 📝 License
 
