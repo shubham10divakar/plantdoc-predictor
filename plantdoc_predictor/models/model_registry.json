@@ -35,6 +35,60 @@
       "accuracy": 0.968,
       "preprocessing": "mobilenetv2",
       "description": "Lightweight model for edge/mobile deployment"
+    },
+    {
+      "name": "densenet121_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet121_v1_plant_disease/densenet121_v1_plant_disease.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet121_v1_plant_disease/densenet121_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "densenet121_v1",
+      "description": "Densenet121 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "densenet169_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet169_v1_plant_disease/densenet169_v1_plant_disease.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet169_v1_plant_disease/densenet169_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "densenet169_v1",
+      "description": "Densenet169 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "densenet210_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet210_v1_plant_disease/densenet210_v1_plant_disease.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/densenet210_v1_plant_disease/densenet210_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "densenet210_v1",
+      "description": "Densenet210 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "vgg16_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vgg16_v1_plant_disease/vgg16_v1_plant_disease_model.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vgg16_v1_plant_disease/vgg16_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "vgg16_v1",
+      "description": "VGG16 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "vgg19_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vgg19_v1_plant_disease/vgg19_v1_plant_disease_model.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vgg19_v1_plant_disease/vgg19_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "vgg19_v1",
+      "description": "VGG19 fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "alexnet_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/alexnet_v1_plant_disease/alexnet_v1_plant_disease_model.h5",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/alexnet_v1_plant_disease/alexnet_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.968,
+      "preprocessing": "alexnet_v1",
+      "description": "Alexnet fine-tuned on PlantVillage 38-class dataset"
     }
   ]
 }
