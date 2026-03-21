@@ -5,7 +5,7 @@ Created on Sat Oct 25 18:55:47 2025
 @author: Subham Divakar
 """
 
-from plantdoc_predictor import Predictor
+from predictor import Predictor
 from plantdoc_predictor.predictor import list_available_models
 
 ##Test 1
@@ -35,7 +35,12 @@ from plantdoc_predictor.predictor import list_available_models
 
 predictor = Predictor(model_name="resnet50_v1")
 
-model = predictor
+model = predictor.get_model()
+#print(type(model))
+weights = predictor.get_weights()
 
-print(type(model))
+weights_info = predictor.get_weights_info()
+
+for layer, shapes in weights_info.items():
+    print(layer, shapes)
 

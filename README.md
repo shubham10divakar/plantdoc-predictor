@@ -22,6 +22,23 @@ A **Python library for predicting plant diseases** from leaf images using pre-tr
 - 🧰 **Visualization support** — Displays prediction confidence and leaf images.  
 - ⚙️ **Cross-platform** — Works seamlessly on Windows, macOS, and Linux.
 
+## 🔬 Advanced Features (NEW 🚀) Will be comming in release 0.2.2(TBD)
+
+- 🧠 **Full Model Access** — Retrieve the complete loaded model for fine-tuning and experimentation.
+- ⚙️ **Weights Extraction** — Access model weights for analysis, comparison, and research.
+- 🧩 **Layer Introspection** — List all layers and inspect architecture programmatically.
+
+---
+
+## 🔥 Feature Extraction (Research-Grade 🚀)
+
+- 📊 Extract intermediate representations from any layer
+- 🧪 Enables **feature-space SMOTE**, clustering, and embedding analysis
+- 🧠 Works across **all models in the model zoo**
+- 🔍 Supports **custom layer selection**
+
+👉 This transforms PlantDoc-Predictor into a **feature extraction + research framework**, not just an inference tool.
+
 ---
 
 ## 🧠 Why Use PlantDoc-Predictor
@@ -276,6 +293,185 @@ WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be 
 ✅ Predicted Class: Blueberry___healthy
 🔢 Confidence     : 100.00%
 {'model': 'efficientnetb50_v1', 'label': 'Blueberry___healthy', 'confidence': 0.9999573230743408}
+```
+
+## 🧠 Access Full Model now 
+
+You can retrieve the full Keras model for advanced use cases like fine-tuning or inspection.
+
+```python
+from plantdoc_predictor import Predictor
+
+predictor = Predictor(model_name="resnet50_v1")
+
+model = predictor.get_model()
+
+print(type(model))
+
+Output:
+%runfile 'D:/D/my docs/my docs/projects/plantdoc-predictor/plantdoc-predictor/plantdoc_predictor/Test_v1.py' --wdir
+2026-03-21 12:39:04.100272: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-03-21 12:39:06.296357: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-03-21 12:39:06.914439: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+<class 'keras.src.models.functional.Functional'>
+
+```
+
+⚙️ Extract Model Weights
+
+Access raw model weights for research and experimentation.
+
+```python
+from plantdoc_predictor import Predictor
+
+predictor = Predictor(model_name="resnet50_v1")
+
+model = predictor.get_model()
+#print(type(model))
+weights = predictor.get_weights()
+
+print("Total weight tensors:", len(weights))
+print("First tensor shape:", weights[0].shape)
+
+Output:
+%runfile 'D:/D/my docs/my docs/projects/plantdoc-predictor/plantdoc-predictor/plantdoc_predictor/Test_v1.py' --wdir
+Reloaded modules: recursive_additive_attention_v1, predictor
+WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+Total weight tensors: 320
+First tensor shape: (7, 7, 3, 64)
+
+```
+
+🧩 Layer-wise Weight Info
+
+Get structured information about model weights.
+```python
+from plantdoc_predictor import Predictor
+predictor = Predictor(model_name="resnet50_v1")
+
+model = predictor.get_model()
+#print(type(model))
+weights = predictor.get_weights()
+
+weights_info = predictor.get_weights_info()
+
+for layer, shapes in weights_info.items():
+    print(layer, shapes)
+
+Output:
+%runfile 'D:/D/my docs/my docs/projects/plantdoc-predictor/plantdoc-predictor/plantdoc_predictor/Test_v1.py' --wdir
+Reloaded modules: recursive_additive_attention_v1, predictor
+WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+conv1_conv [(7, 7, 3, 64), (64,)]
+conv1_bn [(64,), (64,), (64,), (64,)]
+conv2_block1_1_conv [(1, 1, 64, 64), (64,)]
+conv2_block1_1_bn [(64,), (64,), (64,), (64,)]
+conv2_block1_2_conv [(3, 3, 64, 64), (64,)]
+conv2_block1_2_bn [(64,), (64,), (64,), (64,)]
+conv2_block1_0_conv [(1, 1, 64, 256), (256,)]
+conv2_block1_3_conv [(1, 1, 64, 256), (256,)]
+conv2_block1_0_bn [(256,), (256,), (256,), (256,)]
+conv2_block1_3_bn [(256,), (256,), (256,), (256,)]
+conv2_block2_1_conv [(1, 1, 256, 64), (64,)]
+conv2_block2_1_bn [(64,), (64,), (64,), (64,)]
+conv2_block2_2_conv [(3, 3, 64, 64), (64,)]
+conv2_block2_2_bn [(64,), (64,), (64,), (64,)]
+conv2_block2_3_conv [(1, 1, 64, 256), (256,)]
+conv2_block2_3_bn [(256,), (256,), (256,), (256,)]
+conv2_block3_1_conv [(1, 1, 256, 64), (64,)]
+conv2_block3_1_bn [(64,), (64,), (64,), (64,)]
+conv2_block3_2_conv [(3, 3, 64, 64), (64,)]
+conv2_block3_2_bn [(64,), (64,), (64,), (64,)]
+conv2_block3_3_conv [(1, 1, 64, 256), (256,)]
+conv2_block3_3_bn [(256,), (256,), (256,), (256,)]
+conv3_block1_1_conv [(1, 1, 256, 128), (128,)]
+conv3_block1_1_bn [(128,), (128,), (128,), (128,)]
+conv3_block1_2_conv [(3, 3, 128, 128), (128,)]
+conv3_block1_2_bn [(128,), (128,), (128,), (128,)]
+conv3_block1_0_conv [(1, 1, 256, 512), (512,)]
+conv3_block1_3_conv [(1, 1, 128, 512), (512,)]
+conv3_block1_0_bn [(512,), (512,), (512,), (512,)]
+conv3_block1_3_bn [(512,), (512,), (512,), (512,)]
+conv3_block2_1_conv [(1, 1, 512, 128), (128,)]
+conv3_block2_1_bn [(128,), (128,), (128,), (128,)]
+conv3_block2_2_conv [(3, 3, 128, 128), (128,)]
+conv3_block2_2_bn [(128,), (128,), (128,), (128,)]
+conv3_block2_3_conv [(1, 1, 128, 512), (512,)]
+conv3_block2_3_bn [(512,), (512,), (512,), (512,)]
+conv3_block3_1_conv [(1, 1, 512, 128), (128,)]
+conv3_block3_1_bn [(128,), (128,), (128,), (128,)]
+conv3_block3_2_conv [(3, 3, 128, 128), (128,)]
+conv3_block3_2_bn [(128,), (128,), (128,), (128,)]
+conv3_block3_3_conv [(1, 1, 128, 512), (512,)]
+conv3_block3_3_bn [(512,), (512,), (512,), (512,)]
+conv3_block4_1_conv [(1, 1, 512, 128), (128,)]
+conv3_block4_1_bn [(128,), (128,), (128,), (128,)]
+conv3_block4_2_conv [(3, 3, 128, 128), (128,)]
+conv3_block4_2_bn [(128,), (128,), (128,), (128,)]
+conv3_block4_3_conv [(1, 1, 128, 512), (512,)]
+conv3_block4_3_bn [(512,), (512,), (512,), (512,)]
+conv4_block1_1_conv [(1, 1, 512, 256), (256,)]
+conv4_block1_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block1_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block1_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block1_0_conv [(1, 1, 512, 1024), (1024,)]
+conv4_block1_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block1_0_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block1_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block2_1_conv [(1, 1, 1024, 256), (256,)]
+conv4_block2_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block2_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block2_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block2_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block2_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block3_1_conv [(1, 1, 1024, 256), (256,)]
+conv4_block3_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block3_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block3_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block3_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block3_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block4_1_conv [(1, 1, 1024, 256), (256,)]
+conv4_block4_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block4_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block4_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block4_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block4_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block5_1_conv [(1, 1, 1024, 256), (256,)]
+conv4_block5_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block5_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block5_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block5_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block5_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv4_block6_1_conv [(1, 1, 1024, 256), (256,)]
+conv4_block6_1_bn [(256,), (256,), (256,), (256,)]
+conv4_block6_2_conv [(3, 3, 256, 256), (256,)]
+conv4_block6_2_bn [(256,), (256,), (256,), (256,)]
+conv4_block6_3_conv [(1, 1, 256, 1024), (1024,)]
+conv4_block6_3_bn [(1024,), (1024,), (1024,), (1024,)]
+conv5_block1_1_conv [(1, 1, 1024, 512), (512,)]
+conv5_block1_1_bn [(512,), (512,), (512,), (512,)]
+conv5_block1_2_conv [(3, 3, 512, 512), (512,)]
+conv5_block1_2_bn [(512,), (512,), (512,), (512,)]
+conv5_block1_0_conv [(1, 1, 1024, 2048), (2048,)]
+conv5_block1_3_conv [(1, 1, 512, 2048), (2048,)]
+conv5_block1_0_bn [(2048,), (2048,), (2048,), (2048,)]
+conv5_block1_3_bn [(2048,), (2048,), (2048,), (2048,)]
+conv5_block2_1_conv [(1, 1, 2048, 512), (512,)]
+conv5_block2_1_bn [(512,), (512,), (512,), (512,)]
+conv5_block2_2_conv [(3, 3, 512, 512), (512,)]
+conv5_block2_2_bn [(512,), (512,), (512,), (512,)]
+conv5_block2_3_conv [(1, 1, 512, 2048), (2048,)]
+conv5_block2_3_bn [(2048,), (2048,), (2048,), (2048,)]
+conv5_block3_1_conv [(1, 1, 2048, 512), (512,)]
+conv5_block3_1_bn [(512,), (512,), (512,), (512,)]
+conv5_block3_2_conv [(3, 3, 512, 512), (512,)]
+conv5_block3_2_bn [(512,), (512,), (512,), (512,)]
+conv5_block3_3_conv [(1, 1, 512, 2048), (2048,)]
+conv5_block3_3_bn [(2048,), (2048,), (2048,), (2048,)]
+dense [(2048, 38), (38,)]
+
 ```
 
 ## 📝 License
