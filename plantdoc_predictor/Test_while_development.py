@@ -469,5 +469,5 @@ def recaddatt_v1_test():
 #densenet210_v1_test()
 #vgg16_v1_test()
 #vgg19_v1_test()
-alexnet_v1_test()
-#recaddatt_v1_test()
+#alexnet_v1_test()
+recaddatt_v1_test()

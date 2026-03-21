@@ -13,6 +13,7 @@ import json
 import numpy as np
 import requests
 from tqdm import tqdm
+from tensorflow.keras.models import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
@@ -204,7 +205,97 @@ class Predictor:
                     "Initialize Predictor with the desired model_name."
                 )
     
-        return self.model    
+        return self.model
+    
+    def get_weights(self, model_name=None):
+        """
+        Return model weights.
+    
+        Parameters
+        ----------
+        model_name : str, optional
+            If provided, validates the requested model name.
+    
+        Returns
+        -------
+        list
+            List of numpy arrays representing model weights
+        """
+    
+        if model_name:
+            if model_name != self.model_name:
+                raise ValueError(
+                    f"Loaded model is '{self.model_name}', not '{model_name}'. "
+                    "Initialize Predictor with the desired model_name."
+                )
+    
+        return self.model.get_weights()
+
+    def get_weights_info(self):
+        """
+        Return layer-wise weight shapes.
+    
+        Returns
+        -------
+        dict
+            {layer_name: [weight_shapes]}
+        """
+    
+        info = {}
+    
+        for layer in self.model.layers:
+            weights = layer.get_weights()
+            if weights:
+                info[layer.name] = [w.shape for w in weights]
+    
+        return info
+
+    def extract_features(self, img_path, layer_name=None):
+        """
+        Extract features from a specific layer.
+    
+        Parameters
+        ----------
+        img_path : str
+            Path to input image
+        layer_name : str, optional
+            Name of the layer to extract features from.
+            If None, uses second last layer.
+    
+        Returns
+        -------
+        numpy.ndarray
+            Extracted feature vector
+        """
+    
+        # Preprocess image
+        x = self.preprocess(img_path)
+    
+        # Default: use second last layer (common for embeddings)
+        if layer_name is None:
+            layer = self.model.layers[-2]
+        else:
+            try:
+                layer = self.model.get_layer(layer_name)
+            except:
+                raise ValueError(f"Layer '{layer_name}' not found in model")
+    
+        # Create feature extractor model
+        feature_model = Model(
+            inputs=self.model.input,
+            outputs=layer.output
+        )
+    
+        # Extract features
+        features = feature_model.predict(x)
+    
+        return features    
+    
+    def list_layers(self):
+        """
+        Return list of all layer names in the model.
+        """
+        return [layer.name for layer in self.model.layers]
 
     # -----------------------------------------------------------------
     # Image Preprocessing
