@@ -182,6 +182,30 @@ class Predictor:
         else:
             raise ValueError("Please provide either model_name or model_path.")
 
+    def get_model(self, model_name=None):
+        """
+        Return the full model.
+    
+        Parameters
+        ----------
+        model_name : str, optional
+            If provided, validates the requested model name.
+    
+        Returns
+        -------
+        keras.Model
+        """
+    
+        # If user passes model_name, validate it
+        if model_name:
+            if model_name != self.model_name:
+                raise ValueError(
+                    f"Loaded model is '{self.model_name}', not '{model_name}'. "
+                    "Initialize Predictor with the desired model_name."
+                )
+    
+        return self.model    
+
     # -----------------------------------------------------------------
     # Image Preprocessing
     # -----------------------------------------------------------------
