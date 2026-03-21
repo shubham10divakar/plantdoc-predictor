@@ -16,6 +16,7 @@ from tqdm import tqdm
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
+from recursive_additive_attention_v1 import RecursiveAdditiveAttentionModule, AdditiveAttention
 
 
 # ---------------------------------------------------------------------
@@ -128,14 +129,31 @@ class Predictor:
             model_url = model_info["remote_model"]
             labels_url = model_info["remote_labels"]
 
-            model_filename = f"{model_name}.h5"
+            file_type = model_info.get("file_type", "h5")
+
+            model_filename = f"{model_name}.{file_type}"
             labels_filename = f"{model_name}_labels.json"
 
             model_path = download_if_needed(model_url, model_filename, self.verbose)
             label_path = download_if_needed(labels_url, labels_filename, self.verbose)
 
+            # ---------------------------------------------------------
+            # Handle models with custom layers
+            # ---------------------------------------------------------
 
-            self.model = load_model(model_path)
+            if model_name == "rec_add_attention_v1":
+                self.model = load_model(
+                    model_path,
+                    custom_objects={
+                        "AdditiveAttention": AdditiveAttention,
+                        "RecursiveAdditiveAttentionModule": RecursiveAdditiveAttentionModule
+                        },
+                    compile=False
+                    )
+            else:
+                self.model = load_model(model_path)
+                
+                
             self.model_name = model_name
             self.input_size = tuple(model_info.get("input_size", [224, 224]))
             self.accuracy = model_info.get("accuracy", None)

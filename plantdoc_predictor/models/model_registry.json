@@ -1,6 +1,16 @@
 {
   "models": [
     {
+      "name": "rec_add_attention_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/recursive_additive_attention_v1_plant_disease/rec_add_attention_v1_plant_disease_model.keras",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/recursive_additive_attention_v1_plant_disease/rec_add_attention_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.997,
+      "preprocessing": "recursive_additive_attention_cnn",
+      "file_type":"keras",
+      "description": "Recursive Additive Attention based CNN model trained from scratch on PlantVillage 38-class dataset"
+    },
+    {
       "name": "inceptionv3_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1.h5",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1_labels.json",
