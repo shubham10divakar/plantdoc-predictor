@@ -18,7 +18,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
 from recursive_additive_attention_v1 import RecursiveAdditiveAttentionModule, AdditiveAttention
-
+from tensorflow.keras.applications.convnext import preprocess_input as convnext_preprocess
 
 # ---------------------------------------------------------------------
 # Helper: Load Model Registry
@@ -312,6 +312,8 @@ class Predictor:
         
         if self.preprocessing_type == "efficientnet":
             x = eff_preprocess(x)
+        elif self.preprocessing_type == "convnext":
+            x = convnext_preprocess(x)
         else:    
             x = x / 255.0
         return x

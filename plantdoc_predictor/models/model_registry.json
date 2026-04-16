@@ -11,6 +11,36 @@
       "description": "Recursive Additive Attention based CNN model trained from scratch on PlantVillage 38-class dataset"
     },
     {
+      "name": "convnext_base_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_plant_disease_model.keras",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.991,
+      "preprocessing": "convnext",
+      "file_type":"keras",
+      "description": "Convnext base model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "convnext_small_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_small_v1_plant_disease/convnext_small_v1_plant_disease_model.keras",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_small_v1_plant_disease/convnext_small_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.995,
+      "preprocessing": "convnext",
+      "file_type":"keras",
+      "description": "Convnext small model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "convnext_tiny_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_tiny_v1_plant_disease/convnext_tiny_v1_plant_disease_model.keras",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_tiny_v1_plant_disease/convnext_tiny_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.9923,
+      "preprocessing": "convnext",
+      "file_type":"keras",
+      "description": "Convnext tiny model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
       "name": "inceptionv3_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1.h5",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/inceptionv3_v1/inceptionv3_v1_labels.json",

@@ -457,6 +457,116 @@ def recaddatt_v1_test():
     print("Incorrect:", wrong)
     print("Accuracy:", (correct/total)*100, "%")
     
+def convnext_base_v1_test():
+
+    predictor = Predictor(model_name="convnext_base_v1", verbose=True)
+
+    correct = 0
+    wrong = 0
+
+    for path in test_images:
+
+        result = predictor.predict(path)
+
+        true_label = os.path.basename(os.path.dirname(path))
+        predicted_label = result["label"] if isinstance(result, dict) else result
+
+        if predicted_label == true_label:
+            correct += 1
+            status = "CORRECT"
+        else:
+            wrong += 1
+            status = "WRONG"
+
+        print(path)
+        print("True:", true_label)
+        print("Pred:", predicted_label)
+        print("Result:", status)
+        print("------------------------------------------------")
+
+    total = correct + wrong
+
+    print("\nTEST RESULT")
+    print("Model: convnext_base_v1")
+    print("Total:", total)
+    print("Correct:", correct)
+    print("Incorrect:", wrong)
+    print("Accuracy:", (correct/total)*100, "%")
+
+
+def convnext_small_v1_test():
+
+    predictor = Predictor(model_name="convnext_small_v1", verbose=True)
+
+    correct = 0
+    wrong = 0
+
+    for path in test_images:
+
+        result = predictor.predict(path)
+
+        true_label = os.path.basename(os.path.dirname(path))
+        predicted_label = result["label"] if isinstance(result, dict) else result
+
+        if predicted_label == true_label:
+            correct += 1
+            status = "CORRECT"
+        else:
+            wrong += 1
+            status = "WRONG"
+
+        print(path)
+        print("True:", true_label)
+        print("Pred:", predicted_label)
+        print("Result:", status)
+        print("------------------------------------------------")
+
+    total = correct + wrong
+
+    print("\nTEST RESULT")
+    print("Model: convnext_small_v1")
+    print("Total:", total)
+    print("Correct:", correct)
+    print("Incorrect:", wrong)
+    print("Accuracy:", (correct/total)*100, "%")
+
+
+def convnext_tiny_v1_test():
+
+    predictor = Predictor(model_name="convnext_tiny_v1", verbose=True)
+
+    correct = 0
+    wrong = 0
+
+    for path in test_images:
+
+        result = predictor.predict(path)
+
+        true_label = os.path.basename(os.path.dirname(path))
+        predicted_label = result["label"] if isinstance(result, dict) else result
+
+        if predicted_label == true_label:
+            correct += 1
+            status = "CORRECT"
+        else:
+            wrong += 1
+            status = "WRONG"
+
+        print(path)
+        print("True:", true_label)
+        print("Pred:", predicted_label)
+        print("Result:", status)
+        print("------------------------------------------------")
+
+    total = correct + wrong
+
+    print("\nTEST RESULT")
+    print("Model: convnext_tiny_v1")
+    print("Total:", total)
+    print("Correct:", correct)
+    print("Incorrect:", wrong)
+    print("Accuracy:", (correct/total)*100, "%")
+    
     
 #clear_cache()
 #list_available_models()
@@ -470,4 +580,7 @@ def recaddatt_v1_test():
 #vgg16_v1_test()
 #vgg19_v1_test()
 #alexnet_v1_test()
-recaddatt_v1_test()
+#recaddatt_v1_test()
+#convnext_base_v1_test()
+#convnext_small_v1_test()
+convnext_tiny_v1_test()
