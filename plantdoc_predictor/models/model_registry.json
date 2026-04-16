@@ -11,6 +11,17 @@
       "description": "Recursive Additive Attention based CNN model trained from scratch on PlantVillage 38-class dataset"
     },
     {
+      "name": "vit_base_16_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_base_v1/vit_base_patch16_224.pth",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.991,
+      "preprocessing": "vit",
+      "file_type":"pth",
+      "framework":"pytorch",
+      "description": "Vit base 16 model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
       "name": "convnext_base_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_plant_disease_model.keras",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
