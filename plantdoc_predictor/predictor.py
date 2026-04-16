@@ -19,6 +19,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
 from recursive_additive_attention_v1 import RecursiveAdditiveAttentionModule, AdditiveAttention
 from tensorflow.keras.applications.convnext import preprocess_input as convnext_preprocess
+from pytorch_backend import PyTorchBackend
 
 # ---------------------------------------------------------------------
 # Helper: Load Model Registry
@@ -137,48 +138,69 @@ class Predictor:
 
             model_path = download_if_needed(model_url, model_filename, self.verbose)
             label_path = download_if_needed(labels_url, labels_filename, self.verbose)
-
-            # ---------------------------------------------------------
-            # Handle models with custom layers
-            # ---------------------------------------------------------
-
-            if model_name == "rec_add_attention_v1":
-                self.model = load_model(
-                    model_path,
-                    custom_objects={
-                        "AdditiveAttention": AdditiveAttention,
-                        "RecursiveAdditiveAttentionModule": RecursiveAdditiveAttentionModule
-                        },
-                    compile=False
-                    )
-            else:
-                self.model = load_model(model_path)
-                
-                
-            self.model_name = model_name
-            self.input_size = tuple(model_info.get("input_size", [224, 224]))
-            self.accuracy = model_info.get("accuracy", None)
-            self.description = model_info.get("description", "")
-            self.preprocessing_type = model_info.get("preprocessing", "rescale")
-
-            #with open(label_path, "r") as f:
-                #self.labels = json.load(f).get("labels", [])
-            with open(label_path, "r") as f:
-                data = json.load(f)
             
-            # Case 1: {"labels": [...]}
-            if isinstance(data, dict) and "labels" in data:
-                self.labels = data["labels"]
+            # -----------------------------
+            # Framework Split
+            # -----------------------------
+            framework = model_info.get("framework", "keras").lower()
+            self.framework = framework
+        
+            if framework == "keras":
+                print('keras framework detected')
+                # ---------------------------------------------------------
+                # Handle models with custom layers
+                # ---------------------------------------------------------
+                
+                if model_name == "rec_add_attention_v1":
+                    self.model = load_model(
+                        model_path,
+                        custom_objects={
+                            "AdditiveAttention": AdditiveAttention,
+                            "RecursiveAdditiveAttentionModule": RecursiveAdditiveAttentionModule
+                            },
+                        compile=False
+                        )
+                else:
+                    self.model = load_model(model_path)
+                    
+                    
+                self.model_name = model_name
+                self.input_size = tuple(model_info.get("input_size", [224, 224]))
+                self.accuracy = model_info.get("accuracy", None)
+                self.description = model_info.get("description", "")
+                self.preprocessing_type = model_info.get("preprocessing", "rescale")
 
-            # Case 2: {"class_name": index}
-            elif isinstance(data, dict):
-                # 🔥 Reverse mapping
-                idx_to_class = {v: k for k, v in data.items()}
-                # Convert to list (index aligned)
-                self.labels = [idx_to_class[i] for i in range(len(idx_to_class))]
+                #with open(label_path, "r") as f:
+                    #self.labels = json.load(f).get("labels", [])
+                with open(label_path, "r") as f:
+                    data = json.load(f)
+                
+                # Case 1: {"labels": [...]}
+                if isinstance(data, dict) and "labels" in data:
+                    self.labels = data["labels"]
 
+                # Case 2: {"class_name": index}
+                elif isinstance(data, dict):
+                    # 🔥 Reverse mapping
+                    idx_to_class = {v: k for k, v in data.items()}
+                    # Convert to list (index aligned)
+                    self.labels = [idx_to_class[i] for i in range(len(idx_to_class))]
+
+                else:
+                    raise ValueError("Unsupported label format in JSON.")
+        
+            elif framework == "pytorch":
+                print('pytorch framework detected')
+                self.backend = PyTorchBackend(
+                    model_path=model_path,
+                    model_name=model_name,
+                    label_path=label_path,
+                    input_size=tuple(model_info.get("input_size", [224, 224])),
+                    preprocessing_type=model_info.get("preprocessing", "vitbase16")
+                )
+        
             else:
-                raise ValueError("Unsupported label format in JSON.")
+                raise ValueError(f"Unsupported framework '{framework}' for model '{model_name}'")
 
         else:
             raise ValueError("Please provide either model_name or model_path.")
@@ -306,6 +328,7 @@ class Predictor:
         """
         if not os.path.exists(img_path):
             raise FileNotFoundError(f"Image not found: {img_path}")
+            
         img = image.load_img(img_path, target_size=self.input_size)
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
@@ -333,39 +356,42 @@ class Predictor:
             - label: str
             - confidence: float
         """
-        x = self.preprocess(img_path)
-        preds = self.model.predict(x)
-        pred_idx = np.argmax(preds, axis=1)[0]
-        label = self.labels[pred_idx] if self.labels else f"Class_{pred_idx}"
-        
-        if self.verbose:
-            #predictions = model.predict(img_array)
-            #predicted_idx = np.argmax(predictions[0])
-            #predicted_class = class_names[predicted_idx]
-            #confidence = float(np.max(predictions[0]) * 100)
-
-            print("\n================= Prediction Result =================")
-            print(f"📂 Image Path     : {img_path}")
-            print(f"🧩 Model Used     : {self.model_name}")
-            print(f"✅ Predicted Class: {label}")
-            confidence = float(np.max(preds)) * 100
-            print(f"🔢 Confidence     : {confidence:.2f}%")
-            #print("\n🏆 Top-3 Predictions:")
+        if self.framework == "pytorch":
+            return self.backend.predict(img_path)
+        else:
+            x = self.preprocess(img_path)
+            preds = self.model.predict(x)
+            pred_idx = np.argmax(preds, axis=1)[0]
+            label = self.labels[pred_idx] if self.labels else f"Class_{pred_idx}"
             
-            # Top-3 predictions
-            #top3_indices = predictions[0].argsort()[-3:][::-1]
-            #top3 = [(class_names[i], float(predictions[0][i] * 100)) for i in top3_indices]
+            if self.verbose:
+                #predictions = model.predict(img_array)
+                #predicted_idx = np.argmax(predictions[0])
+                #predicted_class = class_names[predicted_idx]
+                #confidence = float(np.max(predictions[0]) * 100)
+    
+                print("\n================= Prediction Result =================")
+                print(f"📂 Image Path     : {img_path}")
+                print(f"🧩 Model Used     : {self.model_name}")
+                print(f"✅ Predicted Class: {label}")
+                confidence = float(np.max(preds)) * 100
+                print(f"🔢 Confidence     : {confidence:.2f}%")
+                #print("\n🏆 Top-3 Predictions:")
+                
+                # Top-3 predictions
+                #top3_indices = predictions[0].argsort()[-3:][::-1]
+                #top3 = [(class_names[i], float(predictions[0][i] * 100)) for i in top3_indices]
+                
+                #for label, conf in top3:
+                 #   print(f"   • {label:40} → {conf:.2f}%")
+                #print("=========================================================\n")
+                
             
-            #for label, conf in top3:
-             #   print(f"   • {label:40} → {conf:.2f}%")
-            #print("=========================================================\n")
-            
-        
-        return {
-            "model": self.model_name,
-            "label": label,
-            "confidence": float(np.max(preds))
-        }
+            return {
+                "model": self.model_name,
+                "label": label,
+                "confidence": float(np.max(preds))
+            }
 
     # -----------------------------------------------------------------
     # Info and Utility Methods

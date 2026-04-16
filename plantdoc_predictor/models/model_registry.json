@@ -8,11 +8,12 @@
       "accuracy": 0.997,
       "preprocessing": "recursive_additive_attention_cnn",
       "file_type":"keras",
+      "framework":"keras",
       "description": "Recursive Additive Attention based CNN model trained from scratch on PlantVillage 38-class dataset"
     },
     {
       "name": "vit_base_16_v1",
-      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_base_v1/vit_base_patch16_224.pth",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_base_v1/vit_base_16_v1.pth",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
       "input_size": [224, 224],
       "accuracy": 0.991,
@@ -29,6 +30,7 @@
       "accuracy": 0.991,
       "preprocessing": "convnext",
       "file_type":"keras",
+      "framework":"keras",
       "description": "Convnext base model fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -39,6 +41,7 @@
       "accuracy": 0.995,
       "preprocessing": "convnext",
       "file_type":"keras",
+      "framework":"keras",
       "description": "Convnext small model fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -49,6 +52,7 @@
       "accuracy": 0.9923,
       "preprocessing": "convnext",
       "file_type":"keras",
+      "framework":"keras",
       "description": "Convnext tiny model fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -58,6 +62,7 @@
       "input_size": [299, 299],
       "accuracy": 0.982,
       "preprocessing": "inception",
+      "framework":"keras",
       "description": "InceptionV3 model fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -67,6 +72,7 @@
       "input_size": [224, 224],
       "accuracy": 0.978,
       "preprocessing": "resnet50",
+      "framework":"keras",
       "description": "ResNet50 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -76,6 +82,7 @@
       "input_size": [224, 224],
       "accuracy": 0.978,
       "preprocessing": "efficientnet",
+      "framework":"keras",
       "description": "EfficientNetB50 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -85,6 +92,7 @@
       "input_size": [224, 224],
       "accuracy": 0.968,
       "preprocessing": "mobilenetv2",
+      "framework":"keras",
       "description": "Lightweight model for edge/mobile deployment"
     },
     {
@@ -94,6 +102,7 @@
       "input_size": [224, 224],
       "accuracy": 0.9868,
       "preprocessing": "densenet121_v1",
+      "framework":"keras",
       "description": "Densenet121 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -103,6 +112,7 @@
       "input_size": [224, 224],
       "accuracy": 0.9968,
       "preprocessing": "densenet169_v1",
+      "framework":"keras",
       "description": "Densenet169 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -112,6 +122,7 @@
       "input_size": [224, 224],
       "accuracy": 0.97,
       "preprocessing": "densenet210_v1",
+      "framework":"keras",
       "description": "Densenet210 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -121,6 +132,7 @@
       "input_size": [224, 224],
       "accuracy": 0.968,
       "preprocessing": "vgg16_v1",
+      "framework":"keras",
       "description": "VGG16 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -130,6 +142,7 @@
       "input_size": [224, 224],
       "accuracy": 0.9898,
       "preprocessing": "vgg19_v1",
+      "framework":"keras",
       "description": "VGG19 fine-tuned on PlantVillage 38-class dataset"
     },
     {
@@ -139,6 +152,7 @@
       "input_size": [224, 224],
       "accuracy": 0.928,
       "preprocessing": "alexnet_v1",
+      "framework":"keras",
       "description": "Alexnet fine-tuned on PlantVillage 38-class dataset"
     }
   ]
