@@ -23,6 +23,39 @@
       "description": "Vit base 16 model fine-tuned on PlantVillage 38-class dataset"
     },
     {
+      "name": "vit_large_16_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_large_v1/vit_large_v1.pth",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.991,
+      "preprocessing": "vit",
+      "file_type":"pth",
+      "framework":"pytorch",
+      "description": "Vit base 16 model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "vit_small_16_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_small_v1/vit_small_v1.pth",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.991,
+      "preprocessing": "vit",
+      "file_type":"pth",
+      "framework":"pytorch",
+      "description": "Vit base 16 model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
+      "name": "vit_tiny_16_v1",
+      "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/vit_tiny_v1/vit_tiny_v1.pth",
+      "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",
+      "input_size": [224, 224],
+      "accuracy": 0.991,
+      "preprocessing": "vit",
+      "file_type":"pth",
+      "framework":"pytorch",
+      "description": "Vit base 16 model fine-tuned on PlantVillage 38-class dataset"
+    },
+    {
       "name": "convnext_base_v1",
       "remote_model": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_plant_disease_model.keras",
       "remote_labels": "https://huggingface.co/sdmlai/plantdoc-predictor/resolve/main/models/convnext_base_v1_plant_disease/convnext_base_v1_labels.json",

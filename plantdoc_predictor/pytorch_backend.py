@@ -32,23 +32,58 @@ class PyTorchBackend:
         model_path,
         map_location="cpu",
         weights_only=False)
-    
-        self.model = timm.create_model(
-            bundle["model_name"],
-            pretrained=False
-        )
-
-        in_features = self.model.head.in_features
         
-        self.model.head = nn.Sequential(
-            nn.Linear(in_features, 512),
-            nn.GELU(),
-            nn.Dropout(0.3),
-            nn.Linear(512, bundle["num_classes"])
-        )
+        # =========================================
+        # CASE 1: Bundle format (correct format)
+        # =========================================
+        if isinstance(bundle, dict) and "model_name" in bundle:
         
-        self.model.load_state_dict(bundle["model_state_dict"])
+            self.model = timm.create_model(
+                bundle["model_name"],
+                pretrained=False
+            )
+        
+            in_features = self.model.head.in_features
+        
+            self.model.head = nn.Sequential(
+                nn.Linear(in_features, 512),
+                nn.GELU(),
+                nn.Dropout(0.3),
+                nn.Linear(512, bundle["num_classes"])
+            )
+        
+            self.model.load_state_dict(bundle["model_state_dict"])
+        
+        # =========================================
+        # CASE 2: Full model (DataParallel or raw)
+        # =========================================
+        else:
+            print("⚠ Detected full model file")
+        
+            if isinstance(bundle, torch.nn.DataParallel):
+                self.model = bundle.module
+            else:
+                self.model = bundle
+        
+        # Final step
         self.model.eval()
+    
+        #self.model = timm.create_model(
+         #   bundle["model_name"],
+          #  pretrained=False
+        #)
+
+        #in_features = self.model.head.in_features
+        
+        #self.model.head = nn.Sequential(
+         #   nn.Linear(in_features, 512),
+          #  nn.GELU(),
+           # nn.Dropout(0.3),
+            #nn.Linear(512, bundle["num_classes"])
+        #)
+        
+        #self.model.load_state_dict(bundle["model_state_dict"])
+        #self.model.eval()
 
         self.labels = []
 
