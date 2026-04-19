@@ -16,7 +16,7 @@ A **Python library for predicting plant diseases** from leaf images using pre-tr
 ## 🚀 Features
 
 - ✅ **Pretrained models included** — Ready-to-use architectures like **InceptionV3**, **ResNet50**, and **MobileNetV2**, trained on the 38-class PlantVillage dataset.  
-- 🧠 **Unified API** — One interface for both built-in and custom `.h5` models.  
+- 🧠 **Unified API** — One interface for both built-in and custom `.h5` models from keras and pytorch.  
 - 🧩 **Custom model support** — Load your own model and label mapping JSON.  
 - 🌱 **Extensible** — Easily add new crops, datasets, or models via `model_registry.json`.  
 - 🧰 **Visualization support** — Displays prediction confidence and leaf images.  
