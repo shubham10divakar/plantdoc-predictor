@@ -7,7 +7,7 @@ with io.open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="plantdoc-predictor",
-    version="0.2.2",  # ⬅️ bump version (PyPI doesn’t allow re-upload of same version)
+    version="1.0.0",  # ⬅️ bump version (PyPI doesn’t allow re-upload of same version)
     author="Subham Divakar",
     author_email="shubham.divakar@gmail.com",
     description="A Python library for predicting plant diseases from leaf images using trained deep learning models.",
@@ -17,9 +17,19 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
+        # Core
+        "numpy>=1.21.0",
+        "Pillow>=9.0.0",
+        "requests>=2.25.0",
+        "tqdm>=4.60.0",
+    
+        # PyTorch stack (for Swin, ViT, timm models)
+        "torch>=2.0.0",
+        "torchvision>=0.15.0",
+        "timm>=0.9.0",
+    
+        # TensorFlow stack (for older models)
         "tensorflow>=2.10.0",
-        "numpy",
-        "Pillow"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

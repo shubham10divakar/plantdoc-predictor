@@ -22,7 +22,7 @@ A **Python library for predicting plant diseases** from leaf images using pre-tr
 - 🧰 **Visualization support** — Displays prediction confidence and leaf images.  
 - ⚙️ **Cross-platform** — Works seamlessly on Windows, macOS, and Linux.
 
-## 🔬 Advanced Features (NEW 🚀) Will be comming in release 0.2.2(TBD)
+## 🔬 Advanced Features (NEW 🚀) Added in release 1.0.0 and above.
 
 - 🧠 **Full Model Access** — Retrieve the complete loaded model for fine-tuning and experimentation.
 - ⚙️ **Weights Extraction** — Access model weights for analysis, comparison, and research.
@@ -63,6 +63,29 @@ These models are automatically downloaded from the remote registry when first us
 
 | Model Name | Input Size | Accuracy | Preprocessing | Description |
 |-------------|-------------|-----------|---------------|--------------|
+| **Recursive Additive Attention v1** | 224×224 | **99.7%** | recursive_additive_attention_cnn | Custom CNN with Recursive Additive Attention (your research model) |
+| **ConvNeXt Base v1** | 224×224 | 99.1% | convnext | Modern ConvNet architecture inspired by transformers |
+| **ConvNeXt Small v1** | 224×224 | **99.5%** | convnext | Lightweight ConvNeXt variant with high accuracy |
+| **ConvNeXt Tiny v1** | 224×224 | 99.23% | convnext | Efficient ConvNeXt model for faster inference |
+| **Swin Base Patch4 Window7** | 224×224 | 99.1% | swin | Hierarchical Vision Transformer with shifted windows |
+| **Swin Tiny Patch4 Window7** | 224×224 | 99.1% | swin | Lightweight Swin Transformer for efficient inference |
+| **ViT Base 16 v1** | 224×224 | 99.1% | vit | Vision Transformer base model |
+| **ViT Large 16 v1** | 224×224 | 99.1% | vit | Larger ViT model with higher capacity |
+| **ViT Small 16 v1** | 224×224 | 99.1% | vit | Smaller ViT model for faster inference |
+| **ViT Tiny 16 v1** | 224×224 | 99.1% | vit | Lightweight Vision Transformer |
+| **DenseNet169 v1** | 224×224 | **99.68%** | densenet169_v1 | Best performing DenseNet variant |
+| **VGG19 v1** | 224×224 | 98.98% | vgg19_v1 | Deep VGG architecture with strong performance |
+| **DenseNet121 v1** | 224×224 | 98.68% | densenet121_v1 | Dense connectivity for efficient feature reuse |
+| **InceptionV3 v1** | 299×299 | 98.2% | inception | Inception architecture with multi-scale feature extraction |
+| **ResNet50 v1** | 224×224 | 97.8% | resnet50 | Residual network for deep feature learning |
+| **EfficientNetB50 v1** | 224×224 | 97.8% | efficientnet | Efficient scaling of CNN architecture |
+| **DenseNet210 v1** | 224×224 | 97.0% | densenet210_v1 | Very deep DenseNet variant |
+| **MobileNetV2 v1** | 224×224 | 96.8% | mobilenetv2 | Mobile-friendly lightweight architecture |
+| **VGG16 v1** | 224×224 | 96.8% | vgg16_v1 | Classic deep CNN architecture |
+| **AlexNet v1** | 224×224 | 92.8% | alexnet_v1 | Early CNN baseline model |
+
+<!-- | Model Name | Input Size | Accuracy | Preprocessing | Description |
+|-------------|-------------|-----------|---------------|--------------|
 | **InceptionV3 v1** | 299×299 | **98.2%** | inception | InceptionV3 model fine-tuned on the PlantVillage 38-class dataset |
 | **ResNet50 v1** | 224×224 | 97.8% | resnet50 | Deep residual network enabling powerful feature extraction |
 | **EfficientNetB50 v1** | 224×224 | 97.8% | efficientnet | EfficientNet architecture balancing accuracy and computational efficiency |
@@ -72,7 +95,19 @@ These models are automatically downloaded from the remote registry when first us
 | **DenseNet210 v1** | 224×224 | 97.0% | densenet210_v1 | Very deep DenseNet architecture for advanced feature extraction |
 | **VGG16 v1** | 224×224 | 96.8% | vgg16_v1 | Classic deep CNN architecture useful for benchmarking experiments |
 | **VGG19 v1** | 224×224 | 98.98% | vgg19_v1 | Deeper VGG architecture providing strong classification performance |
-| **AlexNet v1** | 224×224 | 92.8% | alexnet_v1 | Early CNN architecture useful as a historical baseline model |
+| **AlexNet v1** | 224×224 | 92.8% | alexnet_v1 | Early CNN architecture useful as a historical baseline model | -->
+
+---
+
+## 🧪 Research Models (Published Work)
+
+PlantDoc-Predictor also includes models derived from **peer-reviewed research papers**, enabling reproducibility and direct comparison with published work.
+
+These models represent **novel architectures and contributions to the field of plant disease classification**.
+
+| Model | Paper | Authors | Accuracy | Description |
+|------|--------|----------|-----------|--------------|
+| **Recursive Additive Attention v1** | [IEEE Paper](https://ieeexplore.ieee.org/abstract/document/10958327) | Subham Divakar, Rojalina Priyadarshini | **99.70%** | Custom CNN with Recursive Additive Attention mechanism for enhanced feature interaction and classification performance |
 
 ---
 
@@ -83,10 +118,10 @@ Future releases will include **modern vision architectures** and **transformer-b
 
 Some of the upcoming models planned for integration include:
 
-- **Vision Transformers (ViT)** — e.g., `vit_base_patch16_224`, `vit_large_patch16_224`
-- **ConvNeXt architectures** — e.g., `convnext_tiny`, `convnext_small`, `convnext_base`
-- **Hybrid CNN–Transformer models**
-- **Swin Transformers** — e.g., `swin_tiny_patch4_window7_224`
+- **Vision Transformers (ViT)** — e.g., `vit_base_patch16_224`, `vit_large_patch16_224` Added in release 1.0.0 onwards
+- **ConvNeXt architectures** — e.g., `convnext_tiny`, `convnext_small`, `convnext_base` Added in release 1.0.0 onwards
+- **Hybrid CNN–Transformer models** Added in release 1.0.0 onwards
+- **Swin Transformers** — e.g., `swin_tiny_patch4_window7_224` Added in release 1.0.0 onwards
 - **EfficientNetV2 family**
 - **Multimodal models for plant disease detection that I presented via many conferences.**
 
@@ -180,16 +215,26 @@ The following table compares the pretrained models included in **PlantDoc-Predic
 
 | Model | Parameters | Input Size | Accuracy | Best Use Case |
 |------|-------------|-------------|-----------|---------------|
-| InceptionV3 v1 | ~23M | 299×299 | **98.2%** | High accuracy classification |
-| ResNet50 v1 | ~25M | 224×224 | 97.8% | Deep feature extraction |
-| EfficientNetB50 v1 | ~30M | 224×224 | 97.8% | Balanced accuracy & efficiency |
-| MobileNetV2 v1 | ~3.5M | 224×224 | 96.8% | Edge / mobile deployment |
-| DenseNet121 v1 | ~8M | 224×224 | 98.68% | Efficient deep CNN |
-| DenseNet169 v1 | ~14M | 224×224 | **99.68%** | Highest accuracy |
-| DenseNet210 v1 | ~20M | 224×224 | 97.0% | Deep dense feature learning |
-| VGG16 v1 | ~138M | 224×224 | 96.8% | Baseline CNN benchmark |
-| VGG19 v1 | ~144M | 224×224 | 98.98% | Deeper VGG architecture |
-| AlexNet v1 | ~60M | 224×224 | 92.8% | Historical CNN baseline |
+| **Recursive Additive Attention v1** | ~12–15M* | 224×224 | **99.7%** | Research-grade model with attention (best overall) |
+| **ConvNeXt Base v1** | ~89M | 224×224 | 99.1% | Modern CNN alternative to transformers |
+| **ConvNeXt Small v1** | ~50M | 224×224 | **99.5%** | High accuracy with better efficiency |
+| **ConvNeXt Tiny v1** | ~28M | 224×224 | 99.23% | Efficient modern CNN |
+| **Swin Base Patch4 Window7** | ~88M | 224×224 | 99.1% | Hierarchical Vision Transformer |
+| **Swin Tiny Patch4 Window7** | ~28M | 224×224 | 99.1% | Lightweight transformer |
+| **ViT Large 16 v1** | ~307M | 224×224 | 99.1% | Maximum capacity transformer |
+| **ViT Base 16 v1** | ~86M | 224×224 | 99.1% | Standard transformer baseline |
+| **ViT Small 16 v1** | ~48M | 224×224 | 99.1% | Balanced transformer |
+| **ViT Tiny 16 v1** | ~22M | 224×224 | 99.1% | Lightweight transformer |
+| **DenseNet169 v1** | ~14M | 224×224 | **99.68%** | Best classical CNN |
+| **VGG19 v1** | ~144M | 224×224 | 98.98% | High-capacity CNN |
+| **DenseNet121 v1** | ~8M | 224×224 | 98.68% | Efficient deep CNN |
+| **InceptionV3 v1** | ~23M | 299×299 | 98.2% | Multi-scale feature extraction |
+| **ResNet50 v1** | ~25M | 224×224 | 97.8% | Deep residual learning |
+| **EfficientNetB50 v1** | ~30M | 224×224 | 97.8% | Accuracy-efficiency tradeoff |
+| **DenseNet210 v1** | ~20M | 224×224 | 97.0% | Very deep dense architecture |
+| **MobileNetV2 v1** | ~3.5M | 224×224 | 96.8% | Mobile / edge devices |
+| **VGG16 v1** | ~138M | 224×224 | 96.8% | Benchmark model |
+| **AlexNet v1** | ~60M | 224×224 | 92.8% | Historical baseline |
 
 ---
 
@@ -199,16 +244,26 @@ Top performing models on the **PlantVillage 38-class dataset**.
 
 | Rank | Model | Accuracy |
 |-----|------|-----------|
-| 🥇 | DenseNet169 v1 | **99.68%** |
-| 🥈 | VGG19 v1 | **98.98%** |
-| 🥉 | DenseNet121 v1 | **98.68%** |
-| 4 | InceptionV3 v1 | 98.2% |
-| 5 | ResNet50 v1 | 97.8% |
-| 6 | EfficientNetB50 v1 | 97.8% |
-| 7 | DenseNet210 v1 | 97.0% |
-| 8 | MobileNetV2 v1 | 96.8% |
-| 9 | VGG16 v1 | 96.8% |
-| 10 | AlexNet v1 | 92.8% |
+| 🥇 | **Recursive Additive Attention v1** | **99.70%** |
+| 🥈 | **DenseNet169 v1** | **99.68%** |
+| 🥉 | **ConvNeXt Small v1** | **99.50%** |
+| 4 | ConvNeXt Tiny v1 | 99.23% |
+| 5 | ConvNeXt Base v1 | 99.10% |
+| 6 | Swin Base Patch4 Window7 | 99.10% |
+| 7 | Swin Tiny Patch4 Window7 | 99.10% |
+| 8 | ViT Base 16 v1 | 99.10% |
+| 9 | ViT Large 16 v1 | 99.10% |
+| 10 | ViT Small 16 v1 | 99.10% |
+| 11 | ViT Tiny 16 v1 | 99.10% |
+| 12 | VGG19 v1 | **98.98%** |
+| 13 | DenseNet121 v1 | **98.68%** |
+| 14 | InceptionV3 v1 | 98.20% |
+| 15 | ResNet50 v1 | 97.80% |
+| 16 | EfficientNetB50 v1 | 97.80% |
+| 17 | DenseNet210 v1 | 97.00% |
+| 18 | MobileNetV2 v1 | 96.80% |
+| 19 | VGG16 v1 | 96.80% |
+| 20 | AlexNet v1 | 92.80% |
 
 
 ---
@@ -240,16 +295,26 @@ Output:-
 
 Available Models:
 -----------------
-- inceptionv3_v1      | Input: [299, 299] | Acc: 98.20% | InceptionV3 model fine-tuned on PlantVillage 38-class dataset
-- resnet50_v1         | Input: [224, 224] | Acc: 97.80% | ResNet50 fine-tuned on PlantVillage 38-class dataset
-- efficientnetb50_v1  | Input: [224, 224] | Acc: 97.80% | EfficientNetB50 fine-tuned on PlantVillage 38-class dataset
-- mobilenetv2_v1      | Input: [224, 224] | Acc: 96.80% | Lightweight model for edge/mobile deployment
-- densenet121_v1      | Input: [224, 224] | Acc: 98.68% | DenseNet121 fine-tuned on PlantVillage 38-class dataset
-- densenet169_v1      | Input: [224, 224] | Acc: 99.68% | DenseNet169 fine-tuned on PlantVillage 38-class dataset
-- densenet210_v1      | Input: [224, 224] | Acc: 97.00% | DenseNet210 fine-tuned on PlantVillage 38-class dataset
-- vgg16_v1            | Input: [224, 224] | Acc: 96.80% | VGG16 fine-tuned on PlantVillage 38-class dataset
-- vgg19_v1            | Input: [224, 224] | Acc: 98.98% | VGG19 fine-tuned on PlantVillage 38-class dataset
-- alexnet_v1          | Input: [224, 224] | Acc: 92.80% | AlexNet fine-tuned on PlantVillage 38-class dataset
+- rec_add_attention_v1 | Input: [224, 224] | Acc: 99.70% | Recursive Additive Attention CNN (best overall model)
+- convnext_base_v1     | Input: [224, 224] | Acc: 99.10% | ConvNeXt Base fine-tuned on PlantVillage dataset
+- convnext_small_v1    | Input: [224, 224] | Acc: 99.50% | ConvNeXt Small (high accuracy + efficient)
+- convnext_tiny_v1     | Input: [224, 224] | Acc: 99.23% | Lightweight ConvNeXt for fast inference
+- swin_base_patch4_window7 | Input: [224, 224] | Acc: 99.10% | Swin Transformer (hierarchical vision transformer)
+- swin_tiny_patch4_window7 | Input: [224, 224] | Acc: 99.10% | Lightweight Swin Transformer
+- vit_base_16_v1       | Input: [224, 224] | Acc: 99.10% | Vision Transformer (base)
+- vit_large_16_v1      | Input: [224, 224] | Acc: 99.10% | Vision Transformer (large)
+- vit_small_16_v1      | Input: [224, 224] | Acc: 99.10% | Vision Transformer (small)
+- vit_tiny_16_v1       | Input: [224, 224] | Acc: 99.10% | Vision Transformer (tiny)
+- densenet169_v1       | Input: [224, 224] | Acc: 99.68% | Best-performing classical CNN
+- vgg19_v1             | Input: [224, 224] | Acc: 98.98% | Deep VGG architecture
+- densenet121_v1       | Input: [224, 224] | Acc: 98.68% | Efficient DenseNet variant
+- inceptionv3_v1       | Input: [299, 299] | Acc: 98.20% | InceptionV3 with multi-scale feature extraction
+- resnet50_v1          | Input: [224, 224] | Acc: 97.80% | Residual learning-based CNN
+- efficientnetb50_v1   | Input: [224, 224] | Acc: 97.80% | EfficientNet balancing accuracy & efficiency
+- densenet210_v1       | Input: [224, 224] | Acc: 97.00% | Deep DenseNet architecture
+- mobilenetv2_v1       | Input: [224, 224] | Acc: 96.80% | Mobile/edge optimized model
+- vgg16_v1             | Input: [224, 224] | Acc: 96.80% | Classic CNN baseline
+- alexnet_v1           | Input: [224, 224] | Acc: 92.80% | Early CNN baseline
 ```
 ## 2. Choose a model from the available ones and use it below.
 

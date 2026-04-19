@@ -22,7 +22,7 @@ class PyTorchBackend:
     model_name,
     label_path=None,
     input_size=(224, 224),
-    preprocessing_type="vitbase16"):
+    preprocessing_type="vit"):
         self.framework = "pytorch"
         self.model_name = model_name
         self.input_size = input_size
@@ -37,22 +37,27 @@ class PyTorchBackend:
         # CASE 1: Bundle format (correct format)
         # =========================================
         if isinstance(bundle, dict) and "model_name" in bundle:
-        
-            self.model = timm.create_model(
-                bundle["model_name"],
-                pretrained=False
-            )
-        
-            in_features = self.model.head.in_features
-        
-            self.model.head = nn.Sequential(
-                nn.Linear(in_features, 512),
-                nn.GELU(),
-                nn.Dropout(0.3),
-                nn.Linear(512, bundle["num_classes"])
-            )
-        
-            self.model.load_state_dict(bundle["model_state_dict"])
+            
+            model_name = bundle["model_name"]
+
+            if "swin" in model_name.lower():
+                self.model = self._load_swin_model(bundle)
+            else :
+                self.model = timm.create_model(
+                    bundle["model_name"],
+                    pretrained=False
+                )
+            
+                in_features = self.model.head.in_features
+            
+                self.model.head = nn.Sequential(
+                    nn.Linear(in_features, 512),
+                    nn.GELU(),
+                    nn.Dropout(0.3),
+                    nn.Linear(512, bundle["num_classes"])
+                )
+            
+                self.model.load_state_dict(bundle["model_state_dict"])
         
         # =========================================
         # CASE 2: Full model (DataParallel or raw)
@@ -97,6 +102,17 @@ class PyTorchBackend:
             elif isinstance(data, dict):
                 idx_to_class = {v: k for k, v in data.items()}
                 self.labels = [idx_to_class[i] for i in range(len(idx_to_class))]
+
+    def _load_swin_model(self, bundle):
+        model = timm.create_model(
+            bundle["model_name"],
+            pretrained=False,
+            num_classes=bundle["num_classes"]
+        )
+    
+        model.load_state_dict(bundle["model_state_dict"])
+    
+        return model    
 
     def preprocess(self, img_path):
         if not os.path.exists(img_path):
@@ -171,7 +187,7 @@ class PyTorchBackend:
         # -----------------------------------
         # ImageNet Standard Preprocessing
         # -----------------------------------
-        if self.preprocessing_type == "vit":
+        if self.preprocessing_type == "vit" or self.preprocessing_type == "swin":
             transform = transforms.Compose([
                 transforms.Resize(self.input_size),
                 transforms.ToTensor(),

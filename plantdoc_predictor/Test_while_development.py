@@ -713,6 +713,86 @@ def vit_tiny_16_v1_test():
     print("Incorrect:", wrong)
     print("Accuracy:", (correct / total) * 100, "%")
     
+def swin_base_patch4_window7_test():
+
+    predictor = Predictor(model_name="swin_base_patch4_window7", verbose=True)
+
+    correct = 0
+    wrong = 0
+
+    print("\nRunning Swin Base Test\n")
+    print("--------------------------------------------------")
+
+    for path in test_images:
+
+        result = predictor.predict(path)
+
+        true_label = os.path.basename(os.path.dirname(path))
+        predicted_label = result["label"] if isinstance(result, dict) else result
+
+        if predicted_label == true_label:
+            correct += 1
+            status = "CORRECT"
+        else:
+            wrong += 1
+            status = "WRONG"
+
+        print(path)
+        print("True:", true_label)
+        print("Pred:", predicted_label)
+        print("Result:", status)
+        print("--------------------------------------------------")
+
+    total = correct + wrong
+
+    print("\n========== TEST RESULT ==========")
+    print("Model           : swin_base_patch4_window7")
+    print("Total Tests     :", total)
+    print("Correct         :", correct)
+    print("Incorrect       :", wrong)
+    print("Accuracy        : {:.2f}%".format((correct / total) * 100))
+    print("=================================\n")
+    
+def swin_tiny_patch4_window7_test():
+
+    predictor = Predictor(model_name="swin_tiny_patch4_window7", verbose=True)
+
+    correct = 0
+    wrong = 0
+
+    print("\nRunning Swin Tiny Test\n")
+    print("--------------------------------------------------")
+
+    for path in test_images:
+
+        result = predictor.predict(path)
+
+        true_label = os.path.basename(os.path.dirname(path))
+        predicted_label = result["label"] if isinstance(result, dict) else result
+
+        if predicted_label == true_label:
+            correct += 1
+            status = "CORRECT"
+        else:
+            wrong += 1
+            status = "WRONG"
+
+        print(path)
+        print("True:", true_label)
+        print("Pred:", predicted_label)
+        print("Result:", status)
+        print("--------------------------------------------------")
+
+    total = correct + wrong
+
+    print("\n========== TEST RESULT ==========")
+    print("Model           : swin_tiny_patch4_window7")
+    print("Total Tests     :", total)
+    print("Correct         :", correct)
+    print("Incorrect       :", wrong)
+    print("Accuracy        : {:.2f}%".format((correct / total) * 100))
+    print("=================================\n")
+    
     
 #clear_cache()
 #list_available_models()
@@ -730,7 +810,9 @@ def vit_tiny_16_v1_test():
 #convnext_base_v1_test()
 #convnext_small_v1_test()
 #convnext_tiny_v1_test()
-vit_base_16_v1_test()
+#vit_base_16_v1_test()
 #vit_tiny_16_v1_test()
 #vit_large_16_v1_test()
 #vit_small_16_v1_test()
+#swin_base_patch4_window7_test()
+swin_tiny_patch4_window7_test()
