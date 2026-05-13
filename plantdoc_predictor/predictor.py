@@ -17,9 +17,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
-from recursive_additive_attention_v1 import RecursiveAdditiveAttentionModule, AdditiveAttention
 from tensorflow.keras.applications.convnext import preprocess_input as convnext_preprocess
-from pytorch_backend import PyTorchBackend
+from .pytorch_backend import PyTorchBackend
 
 # ---------------------------------------------------------------------
 # Helper: Load Model Registry
@@ -152,6 +151,7 @@ class Predictor:
                 # ---------------------------------------------------------
                 
                 if model_name == "rec_add_attention_v1":
+                    from .recursive_additive_attention_v1 import RecursiveAdditiveAttentionModule, AdditiveAttention
                     self.model = load_model(
                         model_path,
                         custom_objects={
