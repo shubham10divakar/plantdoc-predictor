@@ -12,6 +12,7 @@ All tests print PASS / FAIL. Exit code 1 if any test fails.
 
 import sys
 import os
+import json
 import tempfile
 
 PASS = "✓ PASS"
@@ -252,7 +253,106 @@ check("export_csv() writes non-empty file", _batch_export_csv)
 check("export_json() writes non-empty file", _batch_export_json)
 
 # ---------------------------------------------------------------------------
-# 8. Cleanup
+# 8. CLI (plantdoc command)
+# ---------------------------------------------------------------------------
+print("\n[8] CLI")
+
+import subprocess
+import shutil
+
+
+def _run_cli(*args):
+    return subprocess.run(
+        ["plantdoc"] + list(args),
+        capture_output=True,
+        text=True
+    )
+
+
+def _cli_help():
+    r = _run_cli("--help")
+    assert r.returncode == 0, f"exit {r.returncode}"
+    assert "predict" in r.stdout and "models" in r.stdout
+
+
+def _cli_models():
+    r = _run_cli("models")
+    assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+    assert "mobilenetv2_v1" in r.stdout
+
+
+def _cli_predict_path():
+    r = _run_cli("predict", dummy_path, "--model", "mobilenetv2_v1")
+    assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+    assert "mobilenetv2_v1" in r.stdout
+
+
+def _cli_predict_top_k():
+    r = _run_cli("predict", dummy_path, "--model", "mobilenetv2_v1", "--top-k", "3")
+    assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+    assert "#1" in r.stdout and "#2" in r.stdout and "#3" in r.stdout
+
+
+def _cli_predict_json():
+    r = _run_cli("predict", dummy_path, "--model", "mobilenetv2_v1", "--json")
+    assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+    data = json.loads(r.stdout.strip())
+    assert "label" in data and "confidence" in data
+
+
+def _cli_batch_folder():
+    folder = tempfile.mkdtemp()
+    try:
+        shutil.copy(dummy_path, os.path.join(folder, "leaf1.jpg"))
+        shutil.copy(dummy_path, os.path.join(folder, "leaf2.jpg"))
+        r = _run_cli("predict", folder, "--model", "mobilenetv2_v1")
+        assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+        assert "2 images" in r.stdout
+    finally:
+        shutil.rmtree(folder)
+
+
+def _cli_batch_csv():
+    folder = tempfile.mkdtemp()
+    out = tempfile.NamedTemporaryFile(suffix=".csv", delete=False)
+    out.close()
+    try:
+        shutil.copy(dummy_path, os.path.join(folder, "leaf1.jpg"))
+        r = _run_cli("predict", folder, "--model", "mobilenetv2_v1", "--output", out.name)
+        assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+        assert os.path.getsize(out.name) > 0, "CSV file is empty"
+    finally:
+        shutil.rmtree(folder)
+        os.unlink(out.name)
+
+
+def _cli_batch_json():
+    folder = tempfile.mkdtemp()
+    out = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    out.close()
+    try:
+        shutil.copy(dummy_path, os.path.join(folder, "leaf1.jpg"))
+        r = _run_cli("predict", folder, "--model", "mobilenetv2_v1", "--output", out.name)
+        assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
+        with open(out.name) as f:
+            data = json.load(f)
+        assert isinstance(data, list) and len(data) == 1
+    finally:
+        shutil.rmtree(folder)
+        os.unlink(out.name)
+
+
+check("plantdoc --help exits 0 and lists commands",    _cli_help)
+check("plantdoc models lists mobilenetv2_v1",          _cli_models)
+check("plantdoc predict <file> works",                 _cli_predict_path)
+check("plantdoc predict --top-k 3 shows #1 #2 #3",    _cli_predict_top_k)
+check("plantdoc predict --json outputs valid JSON",    _cli_predict_json)
+check("plantdoc predict <folder> auto-batch works",    _cli_batch_folder)
+check("plantdoc predict <folder> --output .csv works", _cli_batch_csv)
+check("plantdoc predict <folder> --output .json works",_cli_batch_json)
+
+# ---------------------------------------------------------------------------
+# 9. Cleanup
 # ---------------------------------------------------------------------------
 if dummy_path and os.path.exists(dummy_path):
     os.unlink(dummy_path)

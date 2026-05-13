@@ -133,78 +133,86 @@ Automatic preprocessing selection per model:
 - Added `smoke_test.py` — pre-publish test that installs the wheel in a clean environment and verifies all public APIs
 - Added **top-K predictions**: `predict(img_path, top_k=3)` returns ranked predictions; works on both Keras and PyTorch backends; `BatchPredictor.run()` also accepts `top_k`
 - **PIL Image support**: `predict()` and `BatchPredictor.run()` now accept `PIL.Image` objects directly alongside file paths — enables Streamlit, FastAPI, and any in-memory pipeline without saving to disk first
+- **CLI** (`plantdoc` command): `plantdoc models`, `plantdoc predict leaf.jpg`, `--top-k`, `--json`, batch folder mode, `--output .csv/.json`; registered via `console_scripts` entry point in `setup.py`; `click>=8.0.0` added as dependency
 
 ---
 
 ## What Can Be Built
 
-### Immediate Extensions (Low Effort, High Value)
-
-**A. Confidence Thresholding & "Unknown" Detection**
-Add a minimum confidence threshold — if no class exceeds it, return `"unknown"` or trigger a fallback model. Useful for real-world deployment where out-of-distribution images are common.
-
-**B. ~~Top-K Predictions~~ ✓ Done (v1.0.2)**
-
-**C. Model Ensembling**
-Average softmax outputs from 2–3 complementary models (e.g., CNN + ViT) to boost accuracy on hard cases. The existing `get_model()` API already exposes what's needed.
-
-**D. Grad-CAM / Saliency Maps**
-Visualize which regions of the leaf the model focused on. Works well with the existing layer access APIs. Output: heatmap overlaid on original image.
-
-**E. CLI Tool**
-`plantdoc predict leaf.jpg --model convnext_small_v1` — wraps the Python API for shell use, batch-folder processing, and CI pipelines.
+> Priority order based on widest real-world impact.
 
 ---
 
-### Research & Benchmarking Tools
+### Priority 1 — Ship Together (small, same release)
 
-**F. Benchmark Runner**
+**A. Confidence Threshold / "Unknown" Detection** ← *most critical for production*
+Right now any non-leaf image (a dog, a road) still returns a disease label with high confidence. Add `min_confidence` to `predict()` — if no class exceeds it, return `"unknown"`. Every real app needs this before going to users.
+```python
+p.predict("dog.jpg", min_confidence=0.6)
+# → {"label": "unknown", "confidence": 0.31}
+```
+
+**B. Label Parsing (`crop` + `disease` fields)** ← *low effort, high value*
+Labels are `Apple___Apple_scab`. Every downstream app splits this manually today. Auto-parse it into the result dict — zero new dependencies.
+```python
+# current
+{"label": "Apple___Apple_scab", "confidence": 0.98}
+
+# after
+{"label": "Apple___Apple_scab", "crop": "Apple", "disease": "Apple scab", "is_healthy": False, "confidence": 0.98}
+```
+
+---
+
+### Priority 2
+
+**C. ~~Top-K Predictions~~ ✓ Done (v1.0.2)**
+
+**D. Grad-CAM Heatmaps** ← *biggest wow factor*
+The single most requested feature in any inference library. Researchers need it for papers, app developers need it for user trust. `get_model()` and `list_layers()` already expose everything needed. Output: heatmap overlaid on the original image. Works for Keras models; PyTorch support via hooks.
+
+---
+
+### Priority 3
+
+**E. Feature Extraction for PyTorch Backend** ← *research gap*
+Currently raises `NotImplementedError` for ViT and Swin — the best-performing models in the registry. Researchers using embeddings, clustering, or SMOTE hit a wall immediately. Implement via forward hooks on named modules.
+
+**F. Async Batch Processing** ← *production gap*
+`BatchPredictor` is sequential. Anyone processing a field survey of 500+ images will notice. `ThreadPoolExecutor` wraps the existing `run()` in ~20 lines.
+
+---
+
+### Further Down the Road
+
+**G. Model Ensembling**
+Average softmax outputs from 2–3 complementary models (e.g., CNN + ViT). The existing `get_model()` API already exposes what's needed.
+
+**H. ~~CLI Tool~~ ✓ Done (v1.0.2)**
+
+**I. Benchmark Runner**
 Given a labeled test folder, evaluate all 20 models and output a comparison table (accuracy, inference time, model size). Useful for paper baselines and model selection.
 
-**G. Confusion Matrix Generator**
+**J. Confusion Matrix Generator**
 Per-model confusion matrix + per-class F1 scores. Critical for identifying which disease pairs are hard to distinguish.
 
-**H. Cross-Model Feature Similarity**
-Use the `extract_features()` API to compare intermediate representations across architectures — useful for representational similarity analysis (RSA/CKA).
+**K. FastAPI / Flask REST Endpoint**
+Wrap the predictor in an HTTP API. Input: image file upload. Output: JSON with label, confidence, top-K predictions. PIL support is already in place.
 
----
+**L. Streamlit Demo App**
+Upload a leaf image, pick a model, see the prediction + Grad-CAM heatmap. PIL input support is already in place — `Image.open(uploaded_file)` passes directly to `predict()`.
 
-### Application Layer
+**M. Mobile-Optimized Inference**
+Export MobileNetV2 to TFLite or ONNX for on-device inference — no internet required for farmers in low-connectivity areas.
 
-**I. FastAPI / Flask REST Endpoint**
-Wrap the predictor in an HTTP API. Input: image file upload. Output: JSON with label, confidence, top-K predictions. Ready for integration into farm management apps.
-
-**J. Streamlit Demo App**
-Upload a leaf image, pick a model, see the prediction + Grad-CAM heatmap. Good for demos, paper supplements, and non-technical stakeholders. PIL input support is already in place — the app can pass `Image.open(uploaded_file)` directly to `predict()`.
-
-**K. Mobile-Optimized Inference**
-Export MobileNetV2 (already in registry) to TFLite or ONNX for on-device inference — no internet required for farmers in low-connectivity areas.
-
----
-
-### Dataset & Training Utilities
-
-**L. Custom Fine-Tuning Script**
+**N. Custom Fine-Tuning Script**
 A training wrapper that takes a user's image folder (organized by class), loads a registry model, and fine-tunes the final layers. Makes the library useful for new crops or custom datasets.
 
-**M. Data Augmentation Pipeline**
-Standard augmentation presets (flip, rotate, color jitter, cutout) as a preprocessing utility — useful for fine-tuning and for research ablations.
+**O. SMOTE / Embedding-Based Augmentation**
+Use `extract_features()` to get embeddings, then apply SMOTE in feature space to oversample rare disease classes.
 
-**N. SMOTE / Embedding-Based Augmentation**
-Use `extract_features()` to get embeddings, then apply SMOTE in feature space to oversample rare disease classes. Already partially motivated by the feature extraction API.
-
----
-
-### Developer Experience
-
-**O. Async / Concurrent Batch Processing**
-The current `BatchPredictor` runs sequentially. Add `asyncio` or `ThreadPoolExecutor` support for faster batch jobs on large image sets.
-
-**P. Progress Callbacks & Logging**
+**P. Async Progress Callbacks**
 Hook system for batch jobs: `on_image_start`, `on_image_done`, `on_error` — useful for long-running jobs and UI progress bars.
-
-**Q. Model Card Generator**
-Auto-generate a standardized model card (accuracy, dataset, architecture, limitations) for any registry model — useful for ML transparency requirements.
 
 ---
 

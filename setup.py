@@ -22,15 +22,21 @@ setup(
         "Pillow>=9.0.0",
         "requests>=2.25.0",
         "tqdm>=4.60.0",
-    
+        "click>=8.0.0",
+
         # PyTorch stack (for Swin, ViT, timm models)
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "timm>=0.9.0",
-    
+
         # TensorFlow stack (for older models)
         "tensorflow>=2.10.0",
     ],
+    entry_points={
+        "console_scripts": [
+            "plantdoc=plantdoc_predictor.cli:cli",
+        ],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
