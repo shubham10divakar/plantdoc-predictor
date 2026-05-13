@@ -13,6 +13,7 @@ import json
 import numpy as np
 import requests
 from tqdm import tqdm
+from PIL import Image as PILImage
 from tensorflow.keras.models import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
@@ -322,76 +323,94 @@ class Predictor:
     # -----------------------------------------------------------------
     # Image Preprocessing
     # -----------------------------------------------------------------
-    def preprocess(self, img_path):
+    def preprocess(self, img_input):
         """
         Load and preprocess an image for model inference.
+
+        Parameters
+        ----------
+        img_input : str or PIL.Image.Image
+            File path or an already-loaded PIL image.
         """
-        if not os.path.exists(img_path):
-            raise FileNotFoundError(f"Image not found: {img_path}")
-            
-        img = image.load_img(img_path, target_size=self.input_size)
-        x = image.img_to_array(img)
+        if isinstance(img_input, PILImage.Image):
+            img = img_input.convert("RGB").resize(self.input_size)
+            x = image.img_to_array(img)
+        else:
+            if not os.path.exists(img_input):
+                raise FileNotFoundError(f"Image not found: {img_input}")
+            img = image.load_img(img_input, target_size=self.input_size)
+            x = image.img_to_array(img)
+
         x = np.expand_dims(x, axis=0)
-        
+
         if self.preprocessing_type == "efficientnet":
             x = eff_preprocess(x)
         elif self.preprocessing_type == "convnext":
             x = convnext_preprocess(x)
-        else:    
+        else:
             x = x / 255.0
         return x
 
     # -----------------------------------------------------------------
     # Prediction
     # -----------------------------------------------------------------
-    def predict(self, img_path):
+    def predict(self, img_path, top_k=1):
         """
         Predict the disease label from a given leaf image.
+
+        Parameters
+        ----------
+        img_path : str
+            Path to the input image.
+        top_k : int, optional
+            Number of top predictions to return (default 1).
+            When top_k > 1, result includes a 'top_k' list of
+            {label, confidence} dicts sorted by confidence descending.
 
         Returns
         -------
         dict
-            Dictionary containing:
-            - model: str
-            - label: str
-            - confidence: float
+            Always contains 'model', 'label', 'confidence' (top-1).
+            When top_k > 1 also contains 'top_k' list.
         """
         if self.framework == "pytorch":
-            return self.backend.predict(img_path)
-        else:
-            x = self.preprocess(img_path)
-            preds = self.model.predict(x)
-            pred_idx = np.argmax(preds, axis=1)[0]
-            label = self.labels[pred_idx] if self.labels else f"Class_{pred_idx}"
-            
-            if self.verbose:
-                #predictions = model.predict(img_array)
-                #predicted_idx = np.argmax(predictions[0])
-                #predicted_class = class_names[predicted_idx]
-                #confidence = float(np.max(predictions[0]) * 100)
-    
-                print("\n================= Prediction Result =================")
-                print(f"📂 Image Path     : {img_path}")
-                print(f"🧩 Model Used     : {self.model_name}")
-                print(f"✅ Predicted Class: {label}")
-                confidence = float(np.max(preds)) * 100
-                print(f"🔢 Confidence     : {confidence:.2f}%")
-                #print("\n🏆 Top-3 Predictions:")
-                
-                # Top-3 predictions
-                #top3_indices = predictions[0].argsort()[-3:][::-1]
-                #top3 = [(class_names[i], float(predictions[0][i] * 100)) for i in top3_indices]
-                
-                #for label, conf in top3:
-                 #   print(f"   • {label:40} → {conf:.2f}%")
-                #print("=========================================================\n")
-                
-            
-            return {
-                "model": self.model_name,
-                "label": label,
-                "confidence": float(np.max(preds))
+            return self.backend.predict(img_path, top_k=top_k)
+
+        x = self.preprocess(img_path)
+        preds = self.model.predict(x)
+
+        top_k = min(top_k, len(self.labels) if self.labels else preds.shape[1])
+        top_indices = np.argsort(preds[0])[::-1][:top_k]
+
+        top_results = [
+            {
+                "label": self.labels[i] if self.labels else f"Class_{i}",
+                "confidence": float(preds[0][i])
             }
+            for i in top_indices
+        ]
+
+        if self.verbose:
+            print("\n================= Prediction Result =================")
+            print(f"📂 Image Path     : {img_path}")
+            print(f"🧩 Model Used     : {self.model_name}")
+            print(f"✅ Predicted Class: {top_results[0]['label']}")
+            print(f"🔢 Confidence     : {top_results[0]['confidence'] * 100:.2f}%")
+            if top_k > 1:
+                print(f"\n🏆 Top-{top_k} Predictions:")
+                for rank, r in enumerate(top_results, 1):
+                    print(f"   {rank}. {r['label']:45} → {r['confidence'] * 100:.2f}%")
+            print("=====================================================\n")
+
+        result = {
+            "model": self.model_name,
+            "label": top_results[0]["label"],
+            "confidence": top_results[0]["confidence"],
+        }
+        if top_k > 1:
+            result["top_k"] = top_results
+
+        return result
 
     # -----------------------------------------------------------------
     # Info and Utility Methods

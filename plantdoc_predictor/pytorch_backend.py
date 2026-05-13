@@ -114,39 +114,33 @@ class PyTorchBackend:
     
         return model    
 
-    def preprocess(self, img_path):
-        if not os.path.exists(img_path):
-            raise FileNotFoundError(f"Image not found: {img_path}")
-
-        img = Image.open(img_path).convert("RGB")
-
-        transform = transforms.Compose([
-            transforms.Resize(self.input_size),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            )
-        ])
-
-        return transform(img).unsqueeze(0)
-
-    def predict(self, img_path):
+    def predict(self, img_path, top_k=1):
         x = self.preprocess(img_path)
 
         with torch.no_grad():
             preds = self.model(x)
             probs = torch.softmax(preds, dim=1)
 
-        pred_idx = torch.argmax(probs, dim=1).item()
+        top_k = min(top_k, probs.shape[1])
+        top_probs, top_indices = torch.topk(probs[0], k=top_k)
 
-        label = self.labels[pred_idx] if self.labels else f"Class_{pred_idx}"
+        top_results = [
+            {
+                "label": self.labels[idx.item()] if self.labels else f"Class_{idx.item()}",
+                "confidence": prob.item()
+            }
+            for prob, idx in zip(top_probs, top_indices)
+        ]
 
-        return {
+        result = {
             "model": self.model_name,
-            "label": label,
-            "confidence": probs[0][pred_idx].item()
+            "label": top_results[0]["label"],
+            "confidence": top_results[0]["confidence"],
         }
+        if top_k > 1:
+            result["top_k"] = top_results
+
+        return result
 
     def get_model(self):
         return self.model
@@ -174,15 +168,21 @@ class PyTorchBackend:
             "Feature extraction for PyTorch backend not implemented yet."
         )
         
-    def preprocess(self, img_path):
+    def preprocess(self, img_input):
         """
         Preprocess image for PyTorch model inference.
+
+        Parameters
+        ----------
+        img_input : str or PIL.Image.Image
+            File path or an already-loaded PIL image.
         """
-    
-        if not os.path.exists(img_path):
-            raise FileNotFoundError(f"Image not found: {img_path}")
-    
-        img = Image.open(img_path).convert("RGB")
+        if isinstance(img_input, Image.Image):
+            img = img_input.convert("RGB")
+        else:
+            if not os.path.exists(img_input):
+                raise FileNotFoundError(f"Image not found: {img_input}")
+            img = Image.open(img_input).convert("RGB")
     
         # -----------------------------------
         # ImageNet Standard Preprocessing

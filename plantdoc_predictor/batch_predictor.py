@@ -70,7 +70,7 @@ class BatchPredictor:
         )
         self.model_name = self.predictor.model_name
 
-    def run(self, img_inputs, stop_on_error=False):
+    def run(self, img_inputs, top_k=1, stop_on_error=False):
         """
         Run predictions on a list of images.
 
@@ -78,6 +78,9 @@ class BatchPredictor:
         ----------
         img_inputs : list of str or PIL.Image.Image
             File paths, PIL Images, or a mix of both.
+        top_k : int, optional
+            Number of top predictions per image (default 1).
+            When top_k > 1, each result includes a 'top_k' list.
         stop_on_error : bool, optional
             If True, raises on the first failed image.
             If False (default), records the error and continues.
@@ -89,11 +92,8 @@ class BatchPredictor:
                 input       : str  — file path or 'PIL Image #N'
                 model       : str
                 label       : str
-                crop        : str
-                disease     : str
-                is_healthy  : bool
                 confidence  : float
-                top3        : list
+                top_k       : list (only when top_k > 1)
                 error       : str or None
         """
         if not isinstance(img_inputs, (list, tuple)):
@@ -109,7 +109,7 @@ class BatchPredictor:
                 print(f"[{idx + 1}/{total}] Processing: {label}")
 
             try:
-                result = self.predictor.predict(img_input)
+                result = self.predictor.predict(img_input, top_k=top_k)
                 result["input"] = label
                 result["error"] = None
                 results.append(result)

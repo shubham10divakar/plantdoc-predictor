@@ -15,12 +15,35 @@
 
 ### 1. Single-Image Prediction
 
+Accepts a **file path or a PIL Image** — works with Streamlit, FastAPI, and any in-memory pipeline.
+
 ```python
 from plantdoc_predictor import Predictor
+from PIL import Image
 
 p = Predictor(model_name="convnext_small_v1")
+
+# File path
 result = p.predict("leaf.jpg")
+
+# PIL Image (Streamlit, FastAPI, in-memory)
+pil_img = Image.open(uploaded_file)
+result = p.predict(pil_img)
+
 # {"model": "convnext_small_v1", "label": "Apple___Apple_scab", "confidence": 0.98}
+
+# Top-K — adds a ranked 'top_k' list, top-1 keys unchanged
+result = p.predict("leaf.jpg", top_k=3)
+# {
+#   "model": "convnext_small_v1",
+#   "label": "Apple___Apple_scab",
+#   "confidence": 0.98,
+#   "top_k": [
+#     {"label": "Apple___Apple_scab",        "confidence": 0.98},
+#     {"label": "Apple___Cedar_apple_rust",   "confidence": 0.01},
+#     {"label": "Apple___Black_rot",          "confidence": 0.005}
+#   ]
+# }
 ```
 
 ### 2. Pre-trained Model Registry (20 Models)
@@ -49,11 +72,19 @@ p = Predictor(model_path="my_model.h5", label_path="labels.json")
 
 ### 4. Batch Processing + Export
 
+Accepts file paths, PIL Images, or a mix of both.
+
 ```python
 from plantdoc_predictor import BatchPredictor
 
 bp = BatchPredictor(model_name="densenet169_v1")
-results = bp.run(["img1.jpg", "img2.jpg", "img3.jpg"])
+results = bp.run(["img1.jpg", "img2.jpg", "img3.jpg"])          # top-1
+results = bp.run(["img1.jpg", "img2.jpg", "img3.jpg"], top_k=3) # top-3 per image
+
+# Mix of paths and PIL Images
+pil_imgs = [Image.open(f) for f in uploaded_files]
+results = bp.run(pil_imgs)
+
 bp.export_csv(results, "results.csv")
 bp.export_json(results, "results.json")
 ```
@@ -94,6 +125,17 @@ Automatic preprocessing selection per model:
 
 ---
 
+## Changelog
+
+### v1.0.2
+- Fixed bare module imports (`from pytorch_backend` → `from .pytorch_backend`, `from predictor` → `from .predictor`) that caused `ModuleNotFoundError` when installed via pip
+- `__init__.py` now correctly exports `Predictor`, `BatchPredictor`, and `list_available_models`
+- Added `smoke_test.py` — pre-publish test that installs the wheel in a clean environment and verifies all public APIs
+- Added **top-K predictions**: `predict(img_path, top_k=3)` returns ranked predictions; works on both Keras and PyTorch backends; `BatchPredictor.run()` also accepts `top_k`
+- **PIL Image support**: `predict()` and `BatchPredictor.run()` now accept `PIL.Image` objects directly alongside file paths — enables Streamlit, FastAPI, and any in-memory pipeline without saving to disk first
+
+---
+
 ## What Can Be Built
 
 ### Immediate Extensions (Low Effort, High Value)
@@ -101,8 +143,7 @@ Automatic preprocessing selection per model:
 **A. Confidence Thresholding & "Unknown" Detection**
 Add a minimum confidence threshold — if no class exceeds it, return `"unknown"` or trigger a fallback model. Useful for real-world deployment where out-of-distribution images are common.
 
-**B. Top-K Predictions**
-Return top-3 or top-5 predictions with confidences instead of just the argmax. One method change, significant UX improvement.
+**B. ~~Top-K Predictions~~ ✓ Done (v1.0.2)**
 
 **C. Model Ensembling**
 Average softmax outputs from 2–3 complementary models (e.g., CNN + ViT) to boost accuracy on hard cases. The existing `get_model()` API already exposes what's needed.
@@ -134,7 +175,7 @@ Use the `extract_features()` API to compare intermediate representations across 
 Wrap the predictor in an HTTP API. Input: image file upload. Output: JSON with label, confidence, top-K predictions. Ready for integration into farm management apps.
 
 **J. Streamlit Demo App**
-Upload a leaf image, pick a model, see the prediction + Grad-CAM heatmap. Good for demos, paper supplements, and non-technical stakeholders.
+Upload a leaf image, pick a model, see the prediction + Grad-CAM heatmap. Good for demos, paper supplements, and non-technical stakeholders. PIL input support is already in place — the app can pass `Image.open(uploaded_file)` directly to `predict()`.
 
 **K. Mobile-Optimized Inference**
 Export MobileNetV2 (already in registry) to TFLite or ONNX for on-device inference — no internet required for farmers in low-connectivity areas.
