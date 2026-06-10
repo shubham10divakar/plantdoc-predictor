@@ -132,9 +132,13 @@ class ExplainablePredictor:
         x_tensor = tf.convert_to_tensor(x)
         with tf.GradientTape() as tape:
             conv_out, preds = grad_model(x_tensor)
+            # Flatten to a 1-D score vector (batch size is always 1 here). This is
+            # robust to models whose output carries extra/singleton dims, which would
+            # otherwise make tf.argmax return a non-scalar and break int().
+            scores = tf.reshape(preds, [-1])
             if class_index is None:
-                class_index = int(tf.argmax(preds[0]))
-            class_channel = preds[:, class_index]
+                class_index = int(tf.argmax(scores))
+            class_channel = scores[class_index]
 
         grads = tape.gradient(class_channel, conv_out)
         if grads is None:
@@ -227,7 +231,8 @@ class ExplainablePredictor:
         heatmap, used_index = self._compute_heatmap(x, layer_name, class_index)
 
         label = self.labels[used_index] if self.labels else f"Class_{used_index}"
-        confidence = float(self.model.predict(x, verbose=0)[0][used_index])
+        preds_full = np.asarray(self.model.predict(x, verbose=0)).reshape(-1)
+        confidence = float(preds_full[used_index])
         parsed = parse_label(label)
 
         result = {

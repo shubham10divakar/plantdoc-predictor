@@ -649,13 +649,19 @@ gp.predict("apple_scab.jpg")
 
 See **why** a model made its prediction. `ExplainablePredictor` produces a **Grad-CAM** heatmap highlighting the leaf regions that drove the result — ideal for research papers, debugging, and user trust. *(Keras models; PyTorch ViT/Swin support is on the roadmap.)*
 
+**Example — Apple scab leaf:** the heatmap concentrates on the scab lesions, exactly the regions a plant pathologist would inspect.
+
+| Input leaf | Grad-CAM heatmap |
+|:---:|:---:|
+| <img src="assets/apple_scab_leaf.jpg" width="250"/> | <img src="assets/apple_scab_gradcam.jpg" width="250"/> |
+
 ```python
 from plantdoc_predictor import ExplainablePredictor
 
 ep = ExplainablePredictor(model_name="densenet169_v1")
 
 # Predict + save an overlaid heatmap to disk
-result = ep.explain("apple_leaf.jpg", save_to="heatmap.jpg")
+result = ep.explain("leaf.JPG", save_to="heatmap.jpg")
 print(result)
 # {
 #   'model': 'densenet169_v1',
