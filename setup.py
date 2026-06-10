@@ -7,7 +7,7 @@ with io.open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="plantdoc-predictor",
-    version="1.0.2",
+    version="1.0.3",
     author="Subham Divakar",
     author_email="shubham.divakar@gmail.com",
     description="A Python library for predicting plant diseases from leaf images using trained deep learning models.",
@@ -28,6 +28,9 @@ setup(
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "timm>=0.9.0",
+
+        # CLIP guard (GuardedPredictor)
+        "transformers>=4.30.0",
 
         # TensorFlow stack (for older models)
         "tensorflow>=2.10.0",

@@ -5,7 +5,7 @@
 **plantdoc-predictor** is a Python library for plant disease detection from leaf images. It wraps 20+ pre-trained deep learning models (Keras/TensorFlow and PyTorch) behind a unified, research-friendly API — so you can drop in a model, run inference, extract features, or benchmark architectures without rebuilding the scaffolding each time.
 
 - **PyPI:** `pip install plantdoc-predictor`
-- **Version:** 1.0.2
+- **Version:** 1.0.3
 - **Dataset:** PlantVillage (38 disease classes across 14 crops)
 - **Models hosted on:** Hugging Face (auto-downloaded and cached in `~/.plantdoc/`)
 
@@ -127,6 +127,24 @@ Automatic preprocessing selection per model:
 
 ## Changelog
 
+### v1.0.3
+- **ExplainablePredictor** — new class wrapping `Predictor` that produces **Grad-CAM heatmaps** showing which leaf regions drove a prediction:
+  - `explain(img, save_to="cam.jpg")` returns the prediction dict (with parsed `crop`/`disease`/`is_healthy`) plus `layer_name` and `heatmap_path`
+  - Auto-detects the last 4D conv feature-map layer; override with `layer_name`. Also supports `class_index`, `alpha`, and `return_heatmap` (raw `heatmap` + `overlay` arrays)
+  - **Keras models only.** PyTorch (ViT/Swin) raises `NotImplementedError`; PyTorch Grad-CAM is deferred (see roadmap E). No new dependencies — jet colormap implemented in pure numpy
+  - Existing `Predictor`/`BatchPredictor`/`GuardedPredictor` — zero changes
+- **CLI additions** (existing commands unchanged):
+  - `plantdoc explain leaf.jpg --save-to cam.jpg` — Grad-CAM from the terminal (`--model`, `--layer`, `--class-index`, `--alpha`, `--json`); prints a friendly message for unsupported PyTorch models
+  - `plantdoc predict leaf.jpg --guard` — routes through `GuardedPredictor` (`--guard-threshold`, `--min-confidence`); works in single and batch mode
+- **GuardedPredictor** — new class wrapping `Predictor` with a two-layer guard:
+  - Layer 1: CLIP (`openai/clip-vit-base-patch32`) text-image similarity scores the image against leaf/non-leaf prompts; rejects anything below `guard_threshold` (default 0.5) as `{"label": "unknown", "is_leaf": False}`
+  - Layer 2: optional `min_confidence` floor on the disease model's top-1 output
+  - CLIP lazy-loads on first call (~400MB, cached by HuggingFace); `import GuardedPredictor` is instant
+  - Result always includes `is_leaf`, `guard_score`, `crop`, `disease`, `is_healthy`
+- **Label parsing** (`utils/label_parser.py`): auto-splits `Apple___Apple_scab` → `crop="Apple"`, `disease="Apple scab"`, `is_healthy=False`; `Blueberry___healthy` → `is_healthy=True`
+- `transformers>=4.30.0` added to `install_requires`
+- Existing `Predictor`, `BatchPredictor`, CLI — zero changes
+
 ### v1.0.2
 - Fixed bare module imports (`from pytorch_backend` → `from .pytorch_backend`, `from predictor` → `from .predictor`) that caused `ModuleNotFoundError` when installed via pip
 - `__init__.py` now correctly exports `Predictor`, `BatchPredictor`, and `list_available_models`
@@ -168,8 +186,8 @@ Labels are `Apple___Apple_scab`. Every downstream app splits this manually today
 
 **C. ~~Top-K Predictions~~ ✓ Done (v1.0.2)**
 
-**D. Grad-CAM Heatmaps** ← *biggest wow factor*
-The single most requested feature in any inference library. Researchers need it for papers, app developers need it for user trust. `get_model()` and `list_layers()` already expose everything needed. Output: heatmap overlaid on the original image. Works for Keras models; PyTorch support via hooks.
+**D. ~~Grad-CAM Heatmaps~~ ✓ Done (v1.0.3 — `ExplainablePredictor`, Keras only)**
+Shipped as `ExplainablePredictor` + the `plantdoc explain` CLI command. Outputs a heatmap overlaid on the original leaf. **PyTorch (ViT/Swin) Grad-CAM is deferred** — would need forward/backward hooks: ConvNeXt-PyTorch is easy, Swin needs token→grid reshape, and ViT needs attention-based maps (Grad-CAM is the wrong tool there). Tracked with roadmap E.
 
 ---
 
@@ -223,10 +241,14 @@ plantdoc_predictor/
 ├── predictor.py                        ← Main API (Predictor class)
 ├── batch_predictor.py                  ← Batch inference + CSV/JSON export
 ├── pytorch_backend.py                  ← PyTorch/timm inference backend
+├── guarded_predictor.py                ← CLIP-gated guard mode (v1.0.3)
+├── explainable_predictor.py            ← Grad-CAM heatmaps, Keras (v1.0.3)
 ├── recursive_additive_attention_v1.py  ← Custom attention layers (IEEE paper)
+├── cli.py                              ← CLI via click (models/predict/explain, --guard)
 ├── utils/
 │   ├── preprocessing.py                ← Per-model image preprocessing
-│   └── postprocessing.py               ← Output formatting
+│   ├── postprocessing.py               ← Output formatting
+│   └── label_parser.py                 ← Parses 'Crop___Disease' labels (v1.0.3)
 └── models/
     └── model_registry.json             ← 20 models, remote URLs, metadata
 ```

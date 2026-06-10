@@ -1,5 +1,3 @@
-\# 🌿 PlantDoc Predictor
-
 # 🌿 PlantDoc-Predictor
 
 [![PyPI version](https://badge.fury.io/py/plantdoc-predictor.svg)](https://pypi.org/project/plantdoc-predictor/)
@@ -27,6 +25,12 @@ A **Python library for predicting plant diseases** from leaf images using pre-tr
 - 🧠 **Full Model Access** — Retrieve the complete loaded model for fine-tuning and experimentation.
 - ⚙️ **Weights Extraction** — Access model weights for analysis, comparison, and research.
 - 🧩 **Layer Introspection** — List all layers and inspect architecture programmatically.
+- 🏆 **Top-K Predictions** — Get ranked predictions, not just the top-1 label *(1.0.2+)*.
+- 🖼️ **PIL Image Input** — Pass `PIL.Image` objects directly — ideal for Streamlit / FastAPI *(1.0.2+)*.
+- 📦 **Batch Prediction** — `BatchPredictor` over folders/lists with CSV & JSON export *(1.0.2+)*.
+- 💻 **Command-Line Interface** — `plantdoc models` / `plantdoc predict` *(1.0.2+)*.
+- 🛡️ **Guarded Prediction** — `GuardedPredictor` rejects non-leaf images with a CLIP-based guard *(1.0.3+)*.
+- 🔥 **Grad-CAM Explainability** — `ExplainablePredictor` overlays a heatmap showing which leaf regions drove the prediction *(1.0.3+)*.
 
 ---
 
@@ -114,20 +118,13 @@ These models represent **novel architectures and contributions to the field of p
 ### 🚀 Upcoming Models
 
 PlantDoc-Predictor is actively expanding its **Model Zoo**.  
-Future releases will include **modern vision architectures** and **transformer-based models** to further improve performance and research capabilities.
+Vision Transformers (ViT), ConvNeXt, and Swin Transformers are **already included** (see the Model Zoo above). Future releases aim to add:
 
-Some of the upcoming models planned for integration include:
-
-- **Vision Transformers (ViT)** — e.g., `vit_base_patch16_224`, `vit_large_patch16_224` Added in release 1.0.0 onwards
-- **ConvNeXt architectures** — e.g., `convnext_tiny`, `convnext_small`, `convnext_base` Added in release 1.0.0 onwards
-- **Hybrid CNN–Transformer models** Added in release 1.0.0 onwards
-- **Swin Transformers** — e.g., `swin_tiny_patch4_window7_224` Added in release 1.0.0 onwards
 - **EfficientNetV2 family**
-- **Multimodal models for plant disease detection that I presented via many conferences.**
+- **Hybrid CNN–Transformer models**
+- **Multimodal models for plant disease detection** (presented at several conferences)
 
-Planned release very month and many more features to get added as well. 
-
-These additions will allow researchers and developers to experiment with **state-of-the-art deep learning architectures for plant disease classification**.
+These additions will let researchers and developers experiment with **state-of-the-art deep learning architectures for plant disease classification**.
 
 Stay tuned for future releases as the **PlantDoc Model Zoo continues to grow. 🌿**
 
@@ -538,6 +535,198 @@ conv5_block3_3_bn [(2048,), (2048,), (2048,), (2048,)]
 dense [(2048, 38), (38,)]
 
 ```
+
+## 🏆 Top-K Predictions
+
+Return the top *N* ranked predictions instead of just the best one. Works on both Keras and PyTorch models.
+
+```python
+from plantdoc_predictor import Predictor
+
+predictor = Predictor(model_name="densenet169_v1")
+result = predictor.predict("leaf.jpg", top_k=3)
+print(result)
+
+# {
+#   'model': 'densenet169_v1',
+#   'label': 'Apple___Apple_scab',
+#   'confidence': 0.984,
+#   'top_k': [
+#       {'label': 'Apple___Apple_scab',   'confidence': 0.984},
+#       {'label': 'Apple___Black_rot',    'confidence': 0.011},
+#       {'label': 'Apple___Cedar_apple_rust', 'confidence': 0.003}
+#   ]
+# }
+```
+
+---
+
+## 🖼️ PIL Image Input
+
+`predict()` accepts a `PIL.Image` directly — no need to save to disk first. Perfect for **Streamlit**, **FastAPI**, and in-memory pipelines.
+
+```python
+from PIL import Image
+from plantdoc_predictor import Predictor
+
+predictor = Predictor(model_name="densenet169_v1")
+result = predictor.predict(Image.open("leaf.jpg"))
+```
+
+---
+
+## 🔥 Feature Extraction (Research-Grade)
+
+Extract intermediate representations from any layer for **feature-space SMOTE**, clustering, or embedding analysis. *(Keras models)*
+
+```python
+from plantdoc_predictor import Predictor
+
+predictor = Predictor(model_name="densenet169_v1")
+
+# Default: second-to-last layer (embedding); or pass layer_name="..."
+features = predictor.extract_features("leaf.jpg")
+print(features.shape)   # e.g. (1, 1664)
+
+# Inspect available layers to target a specific one
+print(predictor.list_layers())
+features = predictor.extract_features("leaf.jpg", layer_name="conv5_block16_concat")
+```
+
+---
+
+## 📦 Batch Prediction
+
+Run inference over a list of paths or `PIL.Image` objects and export results.
+
+```python
+from plantdoc_predictor import BatchPredictor
+
+bp = BatchPredictor(model_name="densenet169_v1")
+results = bp.run(["img1.jpg", "img2.jpg", "img3.jpg"], top_k=3)
+
+bp.export_csv(results, "results.csv")
+bp.export_json(results, "results.json")
+bp.summary(results)
+```
+
+---
+
+## 🛡️ GuardedPredictor — Reject Non-Leaf Images
+
+The disease model is a closed-world 38-class classifier — feed it a dog photo and it still returns a confident disease label. `GuardedPredictor` adds a **two-layer guard**:
+
+1. **CLIP leaf guard** — `openai/clip-vit-base-patch32` scores how leaf-like the image is.
+2. **Confidence floor** *(optional)* — rejects low-confidence disease predictions.
+
+```python
+from plantdoc_predictor import GuardedPredictor
+
+gp = GuardedPredictor(model_name="densenet169_v1", guard_threshold=0.5)
+
+# Non-leaf image → rejected
+gp.predict("dog.jpg")
+# {'model': 'densenet169_v1', 'is_leaf': False, 'guard_score': 0.13,
+#  'label': 'unknown', 'confidence': None, 'crop': None, 'disease': None, 'is_healthy': None}
+
+# Leaf image → passes guard, returns parsed result
+gp.predict("apple_scab.jpg")
+# {'model': 'densenet169_v1', 'is_leaf': True, 'guard_score': 0.88,
+#  'label': 'Apple___Apple_scab', 'confidence': 0.98,
+#  'crop': 'Apple', 'disease': 'Apple scab', 'is_healthy': False}
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `guard_threshold` | `0.5` | CLIP leaf-score cutoff. Below this → rejected as non-leaf. |
+| `min_confidence` | `0.0` (off) | Disease-model confidence floor. Below this → `"unknown"`. |
+
+> ℹ️ CLIP lazy-loads on first `predict()` (~400 MB one-time download, cached in `~/.cache/huggingface/`). Importing `GuardedPredictor` is instant.
+
+---
+
+## 🔥 ExplainablePredictor — Grad-CAM Heatmaps (NEW 🚀)
+
+See **why** a model made its prediction. `ExplainablePredictor` produces a **Grad-CAM** heatmap highlighting the leaf regions that drove the result — ideal for research papers, debugging, and user trust. *(Keras models; PyTorch ViT/Swin support is on the roadmap.)*
+
+```python
+from plantdoc_predictor import ExplainablePredictor
+
+ep = ExplainablePredictor(model_name="densenet169_v1")
+
+# Predict + save an overlaid heatmap to disk
+result = ep.explain("apple_leaf.jpg", save_to="heatmap.jpg")
+print(result)
+# {
+#   'model': 'densenet169_v1',
+#   'label': 'Apple___Apple_scab',
+#   'confidence': 0.98,
+#   'crop': 'Apple', 'disease': 'Apple scab', 'is_healthy': False,
+#   'layer_name': 'conv5_block16_concat',   # auto-detected last conv layer
+#   'heatmap_path': 'heatmap.jpg'
+# }
+```
+
+**Options:**
+
+```python
+# Target a specific layer (defaults to the last conv feature map)
+ep.explain("leaf.jpg", save_to="cam.jpg", layer_name="conv5_block16_concat")
+
+# Explain a class other than the predicted one
+ep.explain("leaf.jpg", save_to="cam.jpg", class_index=12)
+
+# Control overlay strength (0–1)
+ep.explain("leaf.jpg", save_to="cam.jpg", alpha=0.6)
+
+# Get the raw arrays back instead of (or in addition to) saving
+result = ep.explain("leaf.jpg", return_heatmap=True)
+heatmap = result["heatmap"]   # HxW float array in [0, 1]
+overlay = result["overlay"]   # HxWx3 uint8 RGB image
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `save_to` | `None` | Path to write the overlaid heatmap (`.jpg`/`.png`). |
+| `layer_name` | auto | Target conv layer; defaults to the last 4D feature-map layer. |
+| `class_index` | predicted | Which class to explain. |
+| `alpha` | `0.4` | Heatmap blend strength. |
+| `return_heatmap` | `False` | Also return the raw `heatmap` + `overlay` arrays. |
+
+---
+
+## 💻 Command-Line Interface
+
+After installing, the `plantdoc` command is available in your terminal.
+
+```bash
+# List all available models
+plantdoc models
+
+# Predict a single image
+plantdoc predict leaf.jpg
+
+# Choose a model + top-3 predictions
+plantdoc predict leaf.jpg --model densenet169_v1 --top-k 3
+
+# Machine-readable JSON output
+plantdoc predict leaf.jpg --json
+
+# Guarded prediction — reject non-leaf images via the CLIP guard
+plantdoc predict leaf.jpg --guard --guard-threshold 0.5
+plantdoc predict leaf.jpg --guard --min-confidence 0.6
+
+# Batch a whole folder → export results
+plantdoc predict ./images_folder/ --output results.csv
+plantdoc predict ./images_folder/ --output results.json
+
+# Grad-CAM explanation — write a heatmap overlay
+plantdoc explain leaf.jpg --save-to cam.jpg
+plantdoc explain leaf.jpg --model densenet169_v1 --layer conv5_block16_concat --alpha 0.6
+plantdoc explain leaf.jpg --json
+```
+
+---
 
 ## 📝 License
 
