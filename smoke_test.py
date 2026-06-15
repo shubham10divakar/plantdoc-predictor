@@ -373,10 +373,19 @@ def _cli_predict_top_k():
     assert "#1" in r.stdout and "#2" in r.stdout and "#3" in r.stdout
 
 
+def _last_json(text):
+    """Return the last JSON object line from output (skips TF/Keras noise)."""
+    for line in reversed(text.strip().splitlines()):
+        line = line.strip()
+        if line.startswith("{") and line.endswith("}"):
+            return json.loads(line)
+    raise AssertionError(f"No JSON object found in output:\n{text}")
+
+
 def _cli_predict_json():
     r = _run_cli("predict", dummy_path, "--model", "mobilenetv2_v1", "--json")
     assert r.returncode == 0, f"exit {r.returncode}\n{r.stderr}"
-    data = json.loads(r.stdout.strip())
+    data = _last_json(r.stdout)
     assert "label" in data and "confidence" in data
 
 
