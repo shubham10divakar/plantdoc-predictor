@@ -187,7 +187,7 @@ class PyTorchBackend:
         # -----------------------------------
         # ImageNet Standard Preprocessing
         # -----------------------------------
-        if self.preprocessing_type == "vit" or self.preprocessing_type == "swin":
+        if self.preprocessing_type in ("vit", "swin", "regnet"):
             transform = transforms.Compose([
                 transforms.Resize(self.input_size),
                 transforms.ToTensor(),
