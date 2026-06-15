@@ -37,26 +37,28 @@ class PyTorchBackend:
         # CASE 1: Bundle format (correct format)
         # =========================================
         if isinstance(bundle, dict) and "model_name" in bundle:
-            
+
             model_name = bundle["model_name"]
 
             if "swin" in model_name.lower():
                 self.model = self._load_swin_model(bundle)
-            else :
+            elif "regnet" in model_name.lower():
+                self.model = self._load_regnet_model(bundle)
+            else:
                 self.model = timm.create_model(
                     bundle["model_name"],
                     pretrained=False
                 )
-            
+
                 in_features = self.model.head.in_features
-            
+
                 self.model.head = nn.Sequential(
                     nn.Linear(in_features, 512),
                     nn.GELU(),
                     nn.Dropout(0.3),
                     nn.Linear(512, bundle["num_classes"])
                 )
-            
+
                 self.model.load_state_dict(bundle["model_state_dict"])
         
         # =========================================
@@ -109,10 +111,56 @@ class PyTorchBackend:
             pretrained=False,
             num_classes=bundle["num_classes"]
         )
-    
         model.load_state_dict(bundle["model_state_dict"])
-    
-        return model    
+        return model
+
+    def _load_regnet_model(self, bundle):
+        state_dict = bundle["model_state_dict"]
+        num_classes = bundle["num_classes"]
+        model_name_str = bundle["model_name"]
+
+        model = timm.create_model(model_name_str, pretrained=False, num_classes=num_classes)
+
+        # Try direct load first (works when timm version matches training env)
+        try:
+            model.load_state_dict(state_dict)
+            return model
+        except RuntimeError:
+            pass
+
+        # Timm version mismatch: checkpoint saved head as head.fc (old ClassifierHead)
+        # but current timm creates NormMlpClassifierHead with indexed layers (head.0, head.3).
+        # Remap by matching tensor shapes so it works across timm versions.
+        if "head.fc.weight" in state_dict:
+            fc_weight = state_dict["head.fc.weight"]
+            fc_bias   = state_dict["head.fc.bias"]
+            current   = model.state_dict()
+
+            head_w_key = next(
+                (k for k in current if "head" in k and k.endswith(".weight")
+                 and current[k].shape == fc_weight.shape),
+                None
+            )
+            head_b_key = next(
+                (k for k in current if "head" in k and k.endswith(".bias")
+                 and current[k].shape == fc_bias.shape),
+                None
+            )
+
+            remapped = {k: v for k, v in state_dict.items()
+                        if not k.startswith("head.fc")}
+            if head_w_key:
+                remapped[head_w_key] = fc_weight
+            if head_b_key:
+                remapped[head_b_key] = fc_bias
+
+            model.load_state_dict(remapped, strict=False)
+            return model
+
+        raise RuntimeError(
+            f"Cannot load RegNet checkpoint '{model_name_str}': unrecognised head structure. "
+            f"Keys found: {[k for k in state_dict if 'head' in k]}"
+        )
 
     def predict(self, img_path, top_k=1):
         x = self.preprocess(img_path)
@@ -185,11 +233,27 @@ class PyTorchBackend:
             img = Image.open(img_input).convert("RGB")
     
         # -----------------------------------
-        # ImageNet Standard Preprocessing
+        # ViT / Swin — just resize to model input
         # -----------------------------------
-        if self.preprocessing_type in ("vit", "swin", "regnet"):
+        if self.preprocessing_type in ("vit", "swin"):
             transform = transforms.Compose([
                 transforms.Resize(self.input_size),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406],
+                    std=[0.229, 0.224, 0.225]
+                )
+            ])
+
+        # -----------------------------------
+        # RegNet — standard ImageNet eval protocol
+        # (resize to 256, center-crop to model input size)
+        # -----------------------------------
+        elif self.preprocessing_type == "regnet":
+            short_edge = int(self.input_size[0] * 256 / 224)
+            transform = transforms.Compose([
+                transforms.Resize(short_edge),
+                transforms.CenterCrop(self.input_size),
                 transforms.ToTensor(),
                 transforms.Normalize(
                     mean=[0.485, 0.456, 0.406],
