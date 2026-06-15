@@ -133,6 +133,24 @@ Stay tuned for future releases as the **PlantDoc Model Zoo continues to grow. �
 
 ---
 
+### 🌍 Upcoming Dataset Support
+
+All models currently in the registry are trained on **PlantVillage** — a controlled lab dataset of 38 classes. We are actively expanding to include models trained on **real-world, field-condition datasets** covering a wider range of crops and geographies.
+
+| Dataset | Classes | Images | Crops | Notes |
+|---------|---------|--------|-------|-------|
+| **PlantVillage** | 38 | ~54K | 14 crops | ✅ Current — lab-condition images |
+| **PlantDoc** | 27 | ~2.6K | 13 crops | 🔜 Real-world field images, more challenging |
+| **Rice Leaf Disease** | 3 | ~120 | Rice | 🔜 Bacterial blight, brown spot, leaf smut |
+| **Cassava Leaf Disease** | 5 | ~21K | Cassava | 🔜 Kaggle competition dataset, field images |
+| **Citrus Disease** | 5 | ~759 | Citrus | 🔜 Blackspot, canker, greening, healthy |
+| **Wheat Disease** | 3+ | varies | Wheat | 🔜 Rust, septoria, yellow rust |
+| **Corn / Maize Disease** | 4 | ~3K | Maize | 🔜 Blight, common rust, gray leaf spot |
+
+> 📌 The `dataset` field is already present in `model_registry.json` for every model — when multi-dataset models land, you will be able to filter by dataset directly via the API.
+
+---
+
 ## 🌍 Community & Contact
 
 PlantDoc-Predictor is growing into a **widely used open-source machine learning library for plant disease classification**.  
@@ -665,7 +683,7 @@ See **why** a model made its prediction. `ExplainablePredictor` produces a **Gra
 
 | Input leaf | Grad-CAM heatmap |
 |:---:|:---:|
-| <img src="assets/apple_scab_leaf.jpg" width="250"/> | <img src="assets/apple_scab_gradcam.jpg" width="250"/> |
+| <img src="https://raw.githubusercontent.com/shubham10divakar/plantdoc-predictor/main/assets/apple_scab_leaf.jpg" width="250"/> | <img src="https://raw.githubusercontent.com/shubham10divakar/plantdoc-predictor/main/assets/apple_scab_gradcam.jpg" width="250"/> |
 
 ```python
 from plantdoc_predictor import ExplainablePredictor
