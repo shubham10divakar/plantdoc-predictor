@@ -19,7 +19,10 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input as eff_preprocess
 from tensorflow.keras.applications.convnext import preprocess_input as convnext_preprocess
-from .pytorch_backend import PyTorchBackend
+try:
+    from .pytorch_backend import PyTorchBackend
+except ImportError:
+    from pytorch_backend import PyTorchBackend
 
 # ---------------------------------------------------------------------
 # Helper: Load Model Registry
