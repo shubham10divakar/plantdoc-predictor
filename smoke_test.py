@@ -3,7 +3,7 @@ smoke_test.py
 -------------
 Run this from OUTSIDE the project directory after installing the wheel.
 
-    pip install dist/plantdoc_predictor-1.0.2-py3-none-any.whl
+    pip install dist/plantdoc_predictor-1.0.4-py3-none-any.whl
     cd C:\\Users\\Subham\\Desktop
     python "D:\\...\\smoke_test.py"
 
@@ -93,8 +93,20 @@ def _registry_has_mobilenet():
     assert any("mobilenet" in m.lower() for m in models), "mobilenetv2_v1 not found"
 
 
+def _registry_has_regnet_models():
+    for name in ("regnetx_160_v1", "regnety_160_v1", "regnety_320_v1"):
+        assert name in models, f"{name} not found in registry"
+
+
+def _registry_count():
+    assert len(models) >= 23, f"expected at least 23 models, got {len(models)}"
+    print(f"         → {len(models)} models registered")
+
+
 check("list_available_models() returns a non-empty list", _list_models)
 check("Registry contains mobilenetv2_v1", _registry_has_mobilenet)
+check("Registry contains all 3 RegNet models", _registry_has_regnet_models)
+check("Registry has at least 23 models", _registry_count)
 
 # ---------------------------------------------------------------------------
 # 3. Create a dummy leaf image for testing (no external files needed)
@@ -253,9 +265,77 @@ check("export_csv() writes non-empty file", _batch_export_csv)
 check("export_json() writes non-empty file", _batch_export_json)
 
 # ---------------------------------------------------------------------------
-# 8. CLI (plantdoc command)
+# 8. PyTorch models — RegNet (new in v1.0.4)
 # ---------------------------------------------------------------------------
-print("\n[8] CLI")
+print("\n[8] PyTorch RegNet models")
+
+REGNET_MODELS = ["regnetx_160_v1", "regnety_160_v1", "regnety_320_v1"]
+_pt_predictor = None
+
+
+def _load_regnetx():
+    global _pt_predictor
+    _pt_predictor = Predictor(model_name="regnetx_160_v1", verbose=False)
+
+
+def _regnetx_predict():
+    result = _pt_predictor.predict(dummy_path)
+    assert "label" in result, "missing 'label'"
+    assert "confidence" in result, "missing 'confidence'"
+    assert isinstance(result["confidence"], float)
+    print(f"         → {result['label']}  ({result['confidence']:.2%})")
+
+
+def _regnetx_predict_top_k():
+    result = _pt_predictor.predict(dummy_path, top_k=3)
+    assert "top_k" in result, "missing 'top_k'"
+    assert len(result["top_k"]) == 3
+    confs = [r["confidence"] for r in result["top_k"]]
+    assert confs == sorted(confs, reverse=True), "top_k not sorted"
+    print(f"         → top-3: {[r['label'].split('___')[-1] for r in result['top_k']]}")
+
+
+def _regnetx_predict_pil():
+    from PIL import Image
+    img = Image.new("RGB", (224, 224), color=(34, 139, 34))
+    result = _pt_predictor.predict(img)
+    assert "label" in result
+
+
+def _load_regnety_160():
+    p = Predictor(model_name="regnety_160_v1", verbose=False)
+    result = p.predict(dummy_path)
+    assert "label" in result and "confidence" in result
+    print(f"         → {result['label']}  ({result['confidence']:.2%})")
+
+
+def _load_regnety_320():
+    p = Predictor(model_name="regnety_320_v1", verbose=False)
+    result = p.predict(dummy_path)
+    assert "label" in result and "confidence" in result
+    print(f"         → {result['label']}  ({result['confidence']:.2%})")
+
+
+def _all_regnet_same_label_count():
+    for name in REGNET_MODELS:
+        p = Predictor(model_name=name, verbose=False)
+        labels = p.get_labels()
+        assert len(labels) == 38, f"{name}: expected 38 labels, got {len(labels)}"
+    print(f"         → all 3 RegNet models have 38 labels")
+
+
+check("Predictor(regnetx_160_v1) loads",                    _load_regnetx)
+check("regnetx_160_v1 predict() returns label+confidence",  _regnetx_predict)
+check("regnetx_160_v1 predict(top_k=3) returns sorted list",_regnetx_predict_top_k)
+check("regnetx_160_v1 accepts PIL Image",                   _regnetx_predict_pil)
+check("regnety_160_v1 loads and predicts",                  _load_regnety_160)
+check("regnety_320_v1 loads and predicts",                  _load_regnety_320)
+check("all RegNet models have 38-class labels",             _all_regnet_same_label_count)
+
+# ---------------------------------------------------------------------------
+# 9. CLI (plantdoc command)
+# ---------------------------------------------------------------------------
+print("\n[9] CLI")
 
 import subprocess
 import shutil

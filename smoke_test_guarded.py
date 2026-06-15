@@ -1,11 +1,11 @@
 """
 smoke_test_guarded.py
 ---------------------
-Smoke test for GuardedPredictor and label_parser — v1.0.3.
+Smoke test for GuardedPredictor and label_parser — v1.0.4.
 
 Run on Colab after installing the wheel:
 
-    !pip install plantdoc_predictor-1.0.3-py3-none-any.whl
+    !pip install plantdoc_predictor-1.0.4-py3-none-any.whl
     !python smoke_test_guarded.py
 
 No real leaf images required — all tests use dummy PIL images.

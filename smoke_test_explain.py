@@ -1,11 +1,11 @@
 """
 smoke_test_explain.py
 ---------------------
-Smoke test for ExplainablePredictor (Grad-CAM) — v1.0.3.
+Smoke test for ExplainablePredictor (Grad-CAM) — v1.0.4.
 
 Run after installing the wheel (e.g. on Colab):
 
-    !pip install plantdoc_predictor-1.0.3-py3-none-any.whl
+    !pip install plantdoc_predictor-1.0.4-py3-none-any.whl
     !python smoke_test_explain.py
 
 No real leaf images required — all tests use a dummy green PIL image.
